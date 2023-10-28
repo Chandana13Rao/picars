@@ -18,11 +18,11 @@ target-aarch64-unknown-linux-gnu/
 bin/
 
 # Ignore temp.ipynb
-python/temp.ipynb
+python/src/temp.ipynb
 
 # Ignore pycache
-python/__pycache__/
+python/src/__pycache__/
 
 # Ignore shared objects
 *.so
-python/*.so
+python/src/*.so

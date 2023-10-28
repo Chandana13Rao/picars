@@ -50,4 +50,4 @@ git:
 # Create rust shared libraries for python
 py: clean
     python -m rustimport build --release ruspy/
-    cp *.so ./python/
+    cp *.so ./python/src/
