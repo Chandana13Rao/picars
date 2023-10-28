@@ -90,7 +90,7 @@ def detect(cv_img):
                 )
 
     # cv2.imshow("detected results", cimg)
-    cv2.imwrite("circles.jpg", cimg)
+    cv2.imwrite("../circles.jpg", cimg)
 
     # cv2.imshow('maskr', maskr)
     # cv2.imshow('maskg', maskg)
@@ -101,5 +101,5 @@ def detect(cv_img):
 
 
 if __name__ == "__main__":
-    cv_img = cv2.imread("red.jpg")
+    cv_img = cv2.imread("../assests/red.jpg")
     detect(cv_img)
