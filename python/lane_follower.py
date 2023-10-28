@@ -8,7 +8,6 @@ from lane_detector import LaneDetector
 
 import ruspy
 
-theta = 0
 minLineLength = 5
 maxLineGap = 10
 
@@ -37,12 +36,13 @@ def run_robot(secs=10):
             print("NO LINES DETECTED")
         else:
             print("CALCULATE THETA")
+            theta = 0
             for x in range(0, len(lines)):
                 for x1, y1, x2, y2 in lines[x]:
-                    cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    # cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                     theta += math.atan2((y2 - y1), (x2 - x1))
-                    print(theta)
 
+            print(theta)
             threshold = 6
             if theta > threshold:
                 print("LEFT")
@@ -91,12 +91,13 @@ def run_robot_with_nn(secs=10):
             print("NO LINES DETECTED")
         else:
             print("CALCULATE THETA")
+            theta = 0
             for x in range(0, len(lines)):
                 for x1, y1, x2, y2 in lines[x]:
                     # cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                     theta += math.atan2((y2 - y1), (x2 - x1))
-                    print(theta)
 
+            print(theta)
             threshold = 6
             if theta > threshold:
                 print("LEFT")
