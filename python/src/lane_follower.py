@@ -70,7 +70,7 @@ def run_robot_with_nn(secs=10):
     # time.sleep(0.5)
 
     # create black image to add left and right lanes
-    lane_img = np.zeros((640, 480, 3), dtype=np.uint8)
+    lane_img = np.zeros((480, 640, 3), dtype=np.uint8)
 
     while (time.time() - started) < secs:
         print("VIDEO CAPTURE STARTED")
