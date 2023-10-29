@@ -461,42 +461,26 @@ def process_image(img):
     return FinalScreen, left_lane, right_lane, curverad, center_diff
 
 
-def calculate_motor_speed(curverad, center_diff):
-    # Define thresholds for curverad and center difference to calculate speed
-    curvature_threshold = 0.01  # Adjust as needed
-    center_diff_threshold = 0.1  # Adjust as needed
-
-    # Calculate the motor speed based on curverad and center_diff
-    if curverad > curvature_threshold:
-        # If the curverad is significant, adjust speed based on curverad
-        motor_speed = 60  # Adjust the speed value as needed for curverad
-    elif abs(center_diff) > center_diff_threshold:
-        # If the center difference is significant, adjust speed based on center_diff
-        motor_speed = 60  # Adjust the speed value as needed for center_diff
-    else:
-        # If neither curverad nor center_diff is significant, go straight at a default speed
-        motor_speed = 50  # Adjust the default speed as needed
-
-    return motor_speed
-
-
-def calculate_front_servo_direction(curverad, center_diff):
+def calc_servo_and_motor_controls(curverad, center_diff):
     # Define a threshold for curverad and center difference to determine direction
     curvature_threshold = 0.01  # Adjust as needed
     center_diff_threshold = 0.1  # Adjust as needed
 
-    # Calculate the front servo direction based on curverad and center_diff
+    # Calculate the front servo direction and motor speed based on curverad and center_diff
     if curverad > curvature_threshold:
         # If the curverad is significant, steer based on curverad
         front_servo_direction = "right" if center_diff > 0 else "left"
+        motor_speed = 50
     elif abs(center_diff) > center_diff_threshold:
         # If the center difference is significant, steer based on center_diff
         front_servo_direction = "right" if center_diff > 0 else "left"
+        motor_speed = 50
     else:
         # If neither curverad nor center_diff is significant, go straight
         front_servo_direction = "straight"
+        motor_speed = 100
 
-    return front_servo_direction
+    return front_servo_direction, motor_speed
 
 
 if __name__ == "__main__":
@@ -505,8 +489,9 @@ if __name__ == "__main__":
     out, left_lane, right_lane, curverad, center_diff = process_image(img)
     plt.imsave("../assests/road_lanes.jpg", out)
 
-    rear_motor_speed = calculate_motor_speed(curverad, center_diff)
-    front_servo_direction = calculate_front_servo_direction(curverad, center_diff)
+    front_servo_direction, rear_motor_speed = calc_servo_and_motor_controls(
+        curverad, center_diff
+    )
     print(
         f"{center_diff = }\n{curverad = }\n{rear_motor_speed = }\n{front_servo_direction = }"
     )

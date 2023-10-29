@@ -3,6 +3,10 @@ import time
 
 import cv2
 import numpy as np
+from algo_lane_follower import (
+    calc_servo_and_motor_controls,
+    process_image,
+)
 from checks import create_video_capture, try_func
 from lane_detector import LaneDetector
 
@@ -12,13 +16,16 @@ minLineLength = 5
 maxLineGap = 10
 
 
-def run_robot(secs=10):
+def run_robot_with_theta(secs=10):
+    print("************************************")
+    print("RUNNIN ROBOT WITH THETA CALCULATIONS")
+    print("************************************")
     started = time.time()
     vid_cap = create_video_capture(640, 480, 30)
     motors = ruspy.motors_init(50, 100)
     motors.speed(100, 100)
     # motors.forward(100)
-    # time.sleep(0.5)
+    time.sleep(0.5)
 
     while (time.time() - started) < secs:
         print("VIDEO CAPTURE STARTED")
@@ -61,13 +68,16 @@ def run_robot(secs=10):
 
 
 def run_robot_with_nn(secs=10):
+    print("**********************************")
+    print("RUNNIN ROBOT WITH MACHINE LEARNING")
+    print("**********************************")
     started = time.time()
     vid_cap = create_video_capture(640, 480, 30)
     ld = LaneDetector(image_width=640, image_height=480)
     motors = ruspy.motors_init(50, 100)
     motors.speed(100, 100)
     # motors.forward(100)
-    # time.sleep(0.5)
+    time.sleep(0.5)
 
     # create black image to add left and right lanes
     lane_img = np.zeros((480, 640, 3), dtype=np.uint8)
@@ -115,7 +125,65 @@ def run_robot_with_nn(secs=10):
     motors.stop()
 
 
+def run_robot_with_algo(secs=10):
+    print("**********************************")
+    print("RUNNIN ROBOT WITH SIMPLE ALGORITHM")
+    print("**********************************")
+    started = time.time()
+    vid_cap = create_video_capture(640, 480, 30)
+    motors = ruspy.motors_init(50, 100)
+    motors.speed(100, 100)
+    # motors.forward(100)
+    time.sleep(0.5)
+
+    while (time.time() - started) < secs:
+        print("VIDEO CAPTURE STARTED")
+        ret, frame = vid_cap.read()
+        if not ret:
+            print("FRAME NOT CAPTURED")
+            continue
+        print("FRAME CAPTURED")
+        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        out, left_lane, right_lane, curverad, center_diff = process_image(img)
+
+        front_servo_direction, rear_motor_speed = calc_servo_and_motor_controls(
+            curverad, center_diff
+        )
+        print(
+            f"{center_diff = }\n{curverad = }\n{rear_motor_speed = }\n{front_servo_direction = }"
+        )
+
+        if front_servo_direction == "left":
+            motors.turn_left(rear_motor_speed)
+        elif front_servo_direction == "right":
+            motors.turn_right(rear_motor_speed)
+        else:
+            motors.forward(rear_motor_speed)
+
+
 if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) < 2:
+        print(
+            """Usage: python lane_follower.py <run_type>
+                  <run_type> can take one of following values:
+                  (theta, nn, algo)"""
+        )
+        sys.exit(1)
+    run_type = sys.argv[1]
+
     ruspy.main_init()
-    try_func(run_robot_with_nn)
+    if run_type == "theta":
+        try_func(run_robot_with_theta)
+    elif run_type == "nn":
+        try_func(run_robot_with_nn)
+    elif run_type == "algo":
+        try_func(run_robot_with_algo)
+    else:
+        print(
+            """Usage: python lane_follower.py <run_type>
+                  <run_type> can take one of following values:
+                  (theta, nn, algo)"""
+        )
     ruspy.reset_mcu()
