@@ -1,8 +1,8 @@
+import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
 from camera_geometry import CameraGeometry
-from torchvision import transforms
 
 
 class LaneDetector:
@@ -11,26 +11,24 @@ class LaneDetector:
         self.cut_v, self.grid = self.cam_geom.precompute_grid()
         self.model = torch.load(model_path, map_location=torch.device("cpu"))
         self.model.eval()
+        self.mean_residuals_thresh = 15
 
     def create_preprocessor(self, cv_image):
-        preprocess = transforms.Compose(
-            [
-                transforms.ToTensor(),
-                transforms.Normalize(
-                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-                ),
-            ]
-        )
         # convert opencv output from BGR to RGB
-        image = cv_image[:, :, [2, 1, 0]]
-        input_tensor = preprocess(image)
-        input_batch = input_tensor.unsqueeze(0)
+        image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
+        image = cv2.resize(
+            image,
+            (self.cam_geom.image_width, self.cam_geom.image_height),
+            interpolation=cv2.INTER_AREA,
+        )
+        image_tensor = image.transpose(2, 0, 1).astype("float32") / 255.0
+        input_batch = torch.from_numpy(image_tensor).unsqueeze(0)
 
         return input_batch
 
     def predict(self, input_batch):
         with torch.no_grad():
-            out = F.softmax(self.model(input_batch), dim=1)
+            out = F.softmax(self.model(input_batch), dim=1).numpy()
             background, left, right = out[0, 0, :, :], out[0, 1, :, :], out[0, 2, :, :]
 
         return background, left, right
@@ -54,6 +52,18 @@ class LaneDetector:
         right_poly = self.fit_poly(right)
 
         return left_poly, right_poly, left, right
+
+    def fit_line_v_of_u(self, probs, thres):
+        v_list, u_list = np.nonzero(probs > thres)
+        if v_list.size == 0:
+            return None
+        coeffs, residuals, _, _, _ = np.polyfit(u_list, v_list, deg=1, full=True)
+
+        mean_residuals = residuals / len(u_list)
+        if mean_residuals > self.mean_residuals_thresh:
+            return None
+        else:
+            return np.poly1d(coeffs)
 
     def __call__(self, cv_image):
         left_poly, right_poly, left, right = self.get_fit_and_probs(cv_image)

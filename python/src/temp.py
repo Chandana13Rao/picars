@@ -1,7 +1,10 @@
-from lane_detector import LaneDetector
+import time
 
 import cv2
-import time
+import matplotlib.pyplot as plt
+import numpy as np
+from lane_detector import LaneDetector
+
 
 def create_video_capture(h=224, w=224, fps=10):
     vid_cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
@@ -10,6 +13,7 @@ def create_video_capture(h=224, w=224, fps=10):
     vid_cap.set(cv2.CAP_PROP_FPS, fps)
 
     return vid_cap
+
 
 def run_preds(vid_cap, ld, secs=10):
     started = time.time()
@@ -35,7 +39,32 @@ def run_preds(vid_cap, ld, secs=10):
             last_logged = now
             frame_count = 0
 
-vid_cap = create_video_capture()
-ld = LaneDetector(image_width=224, image_height=224)
 
-run_preds(vid_cap, ld)
+def nn(ld):
+    img = cv2.imread("../assests/frame.jpg")
+    _, _, left_probs, right_probs = ld(img)
+    line_left = ld.fit_line_v_of_u(left_probs, 0.3)
+    line_right = ld.fit_line_v_of_u(right_probs, 0.3)
+
+    return line_left, line_right
+
+
+def plot_detected_lines(ld, line_left, line_right):
+    u = np.arange(0, ld.cam_geom.image_width, 1)
+    v_left = line_left(u)
+    v_right = line_right(u)
+
+    plt.plot(u, v_left, color="r")
+    plt.plot(u, v_right, color="b")
+    plt.xlim(0, ld.cam_geom.image_width)
+    plt.ylim(ld.cam_geom.image_height, 0)
+    plt.show()
+
+
+# vid_cap = create_video_capture()
+ld = LaneDetector(image_width=640, image_height=480)
+
+# run_preds(vid_cap, ld)
+line_left, line_right = nn(ld)
+print(line_left, line_right)
+plot_detected_lines(ld, line_left, line_right)
