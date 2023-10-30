@@ -90,11 +90,11 @@ impl Motors {
     }
 
     pub fn turn_left(&mut self, speed: i32) {
-        self.speed(-speed, speed);
+        self.forward(speed);
     }
 
     pub fn turn_right(&mut self, speed: i32) {
-        self.speed(speed, -speed);
+        self.forward(speed);
     }
 }
 

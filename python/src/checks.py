@@ -21,22 +21,32 @@ def us_check():
 
 # Motors example check
 def motors_check():
+    """
+    Motor speed varies from 0 (STOP) --> 100 (FULL SPEED)
+    """
     motors = ruspy.motors_init(50, 100)
-    motors.forward(10)
+    motors.forward(100)
     time.sleep(3)
-    motors.turn_left(5)
+    motors.backward(100)
     time.sleep(3)
-    motors.turn_right(15)
+    # Left amnd right turns will just move forward, direction should be controlled by Servos
+    motors.turn_left(100)
     time.sleep(3)
-    motors.backward(20)
+    motors.turn_right(100)
     time.sleep(3)
     motors.stop()
 
 
 # Servos example check
 def servos_check():
+    """
+    Servo Name                           : [EXTREME_LEFT, CENTER, EXTREME_RIGHT]
+    camera_servo_pin1 (Right-Left Servo) : [      ?     ,   80  ,        0     ]
+    camera_servo_pin2 (Up-Down Servo)    : [      ?     ,   ?   ,        ?     ]
+    dir_servo_pin (Front motor Servo)    : [      30    ,   60  ,        90    ]
+    """
     camera_servo_pin1, camera_servo_pin2, dir_servo_pin = ruspy.servos_init(
-        [10, 20, 30]
+        [80, 20, 60]
     )
     camera_servo_pin1.angle(90)
     time.sleep(1)
@@ -44,6 +54,36 @@ def servos_check():
     time.sleep(1)
     dir_servo_pin.angle(90)
     time.sleep(1)
+
+
+# Motors Direction check
+def motors_dir_check():
+    motors = ruspy.motors_init(50, 100)
+    camera_servo_pin1, camera_servo_pin2, dir_servo_pin = ruspy.servos_init(
+        [80, 20, 60]
+    )
+    # Left amnd right turns will just move forward, direction should be controlled by Servos
+    dir_servo_pin.angle(45)
+    motors.turn_left(100)
+    time.sleep(2)
+
+    dir_servo_pin.angle(30)
+    motors.turn_left(100)
+    time.sleep(2)
+
+    dir_servo_pin.angle(60)
+    motors.forward(100)
+    time.sleep(2)
+
+    dir_servo_pin.angle(75)
+    motors.turn_right(100)
+    time.sleep(2)
+
+    dir_servo_pin.angle(90)
+    motors.turn_right(100)
+    time.sleep(2)
+
+    motors.stop()
 
 
 # Cameras example check
