@@ -1,4 +1,21 @@
+import traceback
+
 import cv2
+import rustimport.import_hook  # noqa: F401
+
+import ruspy
+
+
+def try_func(func):
+    try:
+        ruspy.main_init()
+        func()
+    except Exception as e:
+        print(f"ERROR in {func.__name__}: {e}")
+        traceback.print_exc()
+    finally:
+        print("FINAL RESET")
+        ruspy.reset_mcu()
 
 
 def create_video_capture(h=224, w=224, fps=10):

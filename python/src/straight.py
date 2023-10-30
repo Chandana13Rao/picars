@@ -1,8 +1,9 @@
 import time
+from functools import partial
 
 import rustimport.import_hook  # noqa: F401
 from traffic_light import detect
-from utils import create_video_capture
+from utils import create_video_capture, try_func
 
 import ruspy
 
@@ -36,7 +37,9 @@ def run_forward(secs, speed):
 
 if __name__ == "__main__":
     vid_cap = create_video_capture(h=480, w=640, fps=30)
+    run_forward = partial(run_forward, secs=10, speed=100)
+
     if detect_green(vid_cap, max_time_limit=10):
-        run_forward(secs=10, speed=100)
+        try_func(run_forward)
     else:
         print("SORRY,  I didn't get the GREEN signal")
