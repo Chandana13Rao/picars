@@ -17,15 +17,16 @@ maxLineGap = 10
 
 
 def run_robot_with_theta(secs=10):
-    print("************************************")
-    print("RUNNIN ROBOT WITH THETA CALCULATIONS")
-    print("************************************")
+    print("*************************************")
+    print("RUNNING ROBOT WITH THETA CALCULATIONS")
+    print("*************************************")
     started = time.time()
     vid_cap = create_video_capture(640, 480, 30)
     motors = ruspy.motors_init(50, 100)
     motors.speed(100, 100)
     # motors.forward(100)
     time.sleep(0.5)
+    frame_number = 0
 
     while (time.time() - started) < secs:
         print("VIDEO CAPTURE STARTED")
@@ -38,6 +39,8 @@ def run_robot_with_theta(secs=10):
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
         edged = cv2.Canny(blurred, 85, 85)
         lines = cv2.HoughLinesP(edged, 1, np.pi / 180, 10, minLineLength, maxLineGap)
+        filename = f"out_{frame_number}.jpg"
+        cv2.imwrite(filename, lines)
 
         if lines is None:
             print("NO LINES DETECTED")
@@ -63,14 +66,16 @@ def run_robot_with_theta(secs=10):
 
             theta = 0
 
+        frame_number += 1
+
     print("STOPPING MOTORS")
     motors.stop()
 
 
 def run_robot_with_nn(secs=10):
-    print("**********************************")
-    print("RUNNIN ROBOT WITH MACHINE LEARNING")
-    print("**********************************")
+    print("***********************************")
+    print("RUNNING ROBOT WITH MACHINE LEARNING")
+    print("***********************************")
     started = time.time()
     vid_cap = create_video_capture(640, 480, 30)
     ld = LaneDetector(image_width=640, image_height=480)
@@ -78,6 +83,7 @@ def run_robot_with_nn(secs=10):
     motors.speed(100, 100)
     # motors.forward(100)
     time.sleep(0.5)
+    frame_number = 0
 
     # create black image to add left and right lanes
     lane_img = np.zeros((480, 640, 3), dtype=np.uint8)
@@ -96,6 +102,8 @@ def run_robot_with_nn(secs=10):
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
         edged = cv2.Canny(blurred, 85, 85)
         lines = cv2.HoughLinesP(edged, 1, np.pi / 180, 10, minLineLength, maxLineGap)
+        filename = f"out_{frame_number}.jpg"
+        cv2.imwrite(filename, lines)
 
         if lines is None:
             print("NO LINES DETECTED")
@@ -121,20 +129,23 @@ def run_robot_with_nn(secs=10):
 
             theta = 0
 
+        frame_number += 1
+
     print("STOPPING MOTORS")
     motors.stop()
 
 
 def run_robot_with_algo(secs=10):
-    print("**********************************")
-    print("RUNNIN ROBOT WITH SIMPLE ALGORITHM")
-    print("**********************************")
+    print("***********************************")
+    print("RUNNING ROBOT WITH SIMPLE ALGORITHM")
+    print("***********************************")
     started = time.time()
     vid_cap = create_video_capture(640, 480, 30)
     motors = ruspy.motors_init(50, 100)
     motors.speed(100, 100)
     # motors.forward(100)
     time.sleep(0.5)
+    frame_number = 0
 
     while (time.time() - started) < secs:
         print("VIDEO CAPTURE STARTED")
@@ -145,6 +156,8 @@ def run_robot_with_algo(secs=10):
         print("FRAME CAPTURED")
         img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         out, left_lane, right_lane, curverad, center_diff = process_image(img)
+        filename = f"out_{frame_number}.jpg"
+        cv2.imwrite(filename, out)
 
         front_servo_direction, rear_motor_speed = calc_servo_and_motor_controls(
             curverad, center_diff
@@ -159,6 +172,8 @@ def run_robot_with_algo(secs=10):
             motors.turn_right(rear_motor_speed)
         else:
             motors.forward(rear_motor_speed)
+
+        frame_number += 1
 
 
 if __name__ == "__main__":
