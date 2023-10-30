@@ -89,17 +89,13 @@ def detect(cv_img):
                     cimg, "GREEN", (i[0], i[1]), font, 1, (255, 0, 0), 2, cv2.LINE_AA
                 )
 
-    # cv2.imshow("detected results", cimg)
-    cv2.imwrite("../assests/circles.jpg", cimg)
-
-    # cv2.imshow('maskr', maskr)
-    # cv2.imshow('maskg', maskg)
-    # cv2.imshow('masky', masky)
-
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    return len(r_circles) == 0 and len(g_circles) == 1
 
 
 if __name__ == "__main__":
     cv_img = cv2.imread("../assests/red.jpg")
-    detect(cv_img)
+    is_green = detect(cv_img)
+    if is_green:
+        print("GREEN light detected")
+    else:
+        print("RED light detected")
