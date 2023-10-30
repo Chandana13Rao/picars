@@ -378,8 +378,8 @@ def process_image(img):
     cv2.fillPoly(road_bkg, [left_lane], color=[255, 255, 255])
     cv2.fillPoly(road_bkg, [right_lane], color=[255, 255, 255])
 
-    cv2.imshow("road_bkg", road_bkg)
-    cv2.waitKey(0)
+    # cv2.imshow("road_bkg", road_bkg)
+    # cv2.waitKey(0)
 
     # Results screen portion for polynomial fit
     road1 = np.copy(road)
@@ -456,7 +456,7 @@ def process_image(img):
         road1, (640, 360), interpolation=cv2.INTER_AREA
     )
 
-    cv2.destroyAllWindows()
+    # cv2.destroyAllWindows()
 
     return FinalScreen, left_lane, right_lane, curverad, center_diff
 
