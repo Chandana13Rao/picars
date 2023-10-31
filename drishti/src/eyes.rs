@@ -1,4 +1,3 @@
-/*
 use std::{
     f64::consts::PI,
     io::Error,
@@ -579,4 +578,3 @@ pub fn detect_green_light(image: &Mat) -> Result<bool> {
     // Determine if the green/red light is detected based on the pixel count
     Ok(green_pixel_count > red_pixel_count)
 }
- */

@@ -1,7 +1,3 @@
-// rustimport:pyo3
-
-use pyo3::prelude::*;
-
 pub mod axel;
 pub mod drive;
 pub mod neck;
@@ -22,35 +18,17 @@ pub fn map_range(from_range: (i32, i32), to_range: (i32, i32), s: i32) -> i32 {
     to_range.0 + (s - from_range.0) * (to_range.1 - to_range.0) / (from_range.1 - from_range.0)
 }
 
-#[pyclass]
-pub struct MyI2c {
-    pub i2c: I2c,
-}
+pub fn init_i2c() -> Result<I2c> {
+    let mut i2c = I2c::with_bus(I2C_BUS)?;
+    // wait after I2C init to avopid 121 IO error
+    sleep(Duration::from_secs(1));
 
-#[pymethods]
-impl MyI2c {
-    #[new]
-    pub fn new() -> Result<MyI2c> {
-        let mut i2c = I2c::with_bus(I2C_BUS).context("Constructing new I2C failed")?;
-        // wait after I2C init to avopid 121 IO error
-        sleep(Duration::from_secs(1));
+    i2c.set_slave_address(SLAVE_ADDR)?;
+    i2c.smbus_send_byte(0x2C)?;
+    i2c.smbus_send_byte(0x00)?;
+    i2c.smbus_send_byte(0x00)?;
 
-        i2c.set_slave_address(SLAVE_ADDR)
-            .context("Setting SLAVE addr failed")?;
-        i2c.smbus_send_byte(0x2C)
-            .context("Sending byte 0x2c failed")?;
-        i2c.smbus_send_byte(0x00)
-            .context("Sending byte 0x00 failed")?;
-        i2c.smbus_send_byte(0x00)
-            .context("Sending byte 0x00 failed")?;
-
-        Ok(MyI2c { i2c })
-    }
-}
-
-#[pyfunction]
-pub fn init_i2c() -> Result<MyI2c> {
-    MyI2c::new()
+    Ok(i2c)
 }
 
 fn run_command(cmd: &str) -> Result<(i32, String), Box<dyn std::error::Error>> {
@@ -92,19 +70,15 @@ pub fn scan_i2c(i2c: I2c) -> Vec<u16> {
     addresses
 }
 
-#[pyclass]
 pub struct PWM {
     channel: u8,
     period: Vec<u16>,
     bus: I2c,
 }
 
-#[pymethods]
 impl PWM {
-    #[new]
     pub fn new(channel: u8) -> Result<Self> {
         let bus = init_i2c().context("PWM I2C INIT FAILED")?;
-        let bus = bus.i2c;
         let period = vec![0, 0, 0, 0];
         let mut pwm = Self {
             channel,
