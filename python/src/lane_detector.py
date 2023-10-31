@@ -6,7 +6,10 @@ from camera_geometry import CameraGeometry
 
 
 class LaneDetector:
-    def __init__(self, model_path="../assests/model.pth", *args, **kwargs):
+    def __init__(
+        self, model_path="../assests/model.pth", lane_width=0.36, *args, **kwargs
+    ):
+        self.lane_width = lane_width
         self.cam_geom = CameraGeometry(*args, **kwargs)
         self.cut_v, self.grid = self.cam_geom.precompute_grid()
         self.model = torch.load(model_path, map_location=torch.device("cpu"))
@@ -65,7 +68,30 @@ class LaneDetector:
         else:
             return np.poly1d(coeffs)
 
-    def __call__(self, cv_image):
-        left_poly, right_poly, left, right = self.get_fit_and_probs(cv_image)
+    def get_intersection(self, line1, line2):
+        xm_per_pix = self.lane_width / self.cam_geom.image_width
+        m1, c1 = line1
+        m2, c2 = line2
+        if m1 == m2:
+            return None
+        u_i = (c2 - c1) / (m1 - m2)
+        v_i = m1 * u_i + c1
+        return u_i * xm_per_pix, v_i * xm_per_pix
 
-        return left_poly, right_poly, left, right
+    def __call__(self, cv_image):
+        left_poly, right_poly, left_probs, right_probs = self.get_fit_and_probs(
+            cv_image
+        )
+        line_left = self.fit_line_v_of_u(left_probs, 0.3)
+        line_right = self.fit_line_v_of_u(right_probs, 0.3)
+        lane_center, _ = self.get_intersection(line_left, line_right)
+        lane_deviation = lane_center - (self.lane_width / 2)
+
+        return (
+            left_poly,
+            right_poly,
+            left_probs,
+            right_probs,
+            lane_center,
+            lane_deviation,
+        )

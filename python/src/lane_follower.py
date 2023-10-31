@@ -14,6 +14,7 @@ import ruspy
 
 minLineLength = 5
 maxLineGap = 10
+lane_width = 0.36  # 36 cms
 
 
 def run_robot_with_theta(secs=10):
@@ -95,7 +96,74 @@ def run_robot_with_nn(secs=10):
             print("FRAME NOT CAPTURED")
             continue
         print("FRAME CAPTURED")
-        _, _, left, right = ld(frame)
+        _, _, left, right, _ = ld(frame)
+        lane_img[left > 0.5, :] = [255, 255, 255]
+        lane_img[right > 0.5, :] = [255, 255, 255]
+        gray = cv2.cvtColor(lane_img, cv2.COLOR_BGR2GRAY)
+        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+        edged = cv2.Canny(blurred, 85, 85)
+        lines = cv2.HoughLinesP(edged, 1, np.pi / 180, 10, minLineLength, maxLineGap)
+        filename = f"out_{frame_number}.jpg"
+        cv2.imwrite(filename, lines)
+
+        if lines is None:
+            print("NO LINES DETECTED")
+        else:
+            print("CALCULATE THETA")
+            theta = 0
+            for x in range(0, len(lines)):
+                for x1, y1, x2, y2 in lines[x]:
+                    # cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    theta += math.atan2((y2 - y1), (x2 - x1))
+
+            print(theta)
+            threshold = 6
+            if theta > threshold:
+                print("LEFT")
+                motors.turn_left(100)
+            if theta < -threshold:
+                print("RIGHT")
+                motors.turn_right(100)
+            if abs(theta) < threshold:
+                print("STRAIGHT")
+                motors.forward(100)
+
+            theta = 0
+
+        frame_number += 1
+
+    print("STOPPING MOTORS")
+    motors.stop()
+
+
+def run_robot_with_nn_algo(secs=10):
+    print("***********************************")
+    print("RUNNING ROBOT WITH MACHINE LEARNING")
+    print("***********************************")
+    started = time.time()
+    vid_cap = create_video_capture(640, 480, 30)
+    ld = LaneDetector(image_width=640, image_height=480)
+    motors = ruspy.motors_init(50, 100)
+    motors.speed(100, 100)
+    # motors.forward(100)
+    time.sleep(0.5)
+    frame_number = 0
+
+    # create black image to add left and right lanes
+    lane_img = np.zeros((480, 640, 3), dtype=np.uint8)
+
+    while (time.time() - started) < secs:
+        print("VIDEO CAPTURE STARTED")
+        ret, frame = vid_cap.read()
+        if not ret:
+            print("FRAME NOT CAPTURED")
+            continue
+        print("FRAME CAPTURED")
+        left_poly, right_poly, left, right, x_center = ld(frame)
+        lane_deviation = x_center - (lane_width / 2)
+        print(f"Lane Center (X-coordinate): {x_center} meters")
+        print(f"Lane Deviation: {lane_deviation} meters")
+
         lane_img[left > 0.5, :] = [255, 255, 255]
         lane_img[right > 0.5, :] = [255, 255, 255]
         gray = cv2.cvtColor(lane_img, cv2.COLOR_BGR2GRAY)
@@ -183,7 +251,7 @@ if __name__ == "__main__":
         print(
             """Usage: python lane_follower.py <run_type>
                   <run_type> can take one of following values:
-                  (theta, nn, algo)"""
+                  (theta, nn, nn-algo, algo)"""
         )
         sys.exit(1)
     run_type = sys.argv[1]
@@ -199,6 +267,6 @@ if __name__ == "__main__":
         print(
             """Usage: python lane_follower.py <run_type>
                   <run_type> can take one of following values:
-                  (theta, nn, algo)"""
+                  (theta, nn, nn-algo, algo)"""
         )
     ruspy.reset_mcu()

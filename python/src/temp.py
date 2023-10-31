@@ -42,11 +42,12 @@ def run_preds(vid_cap, ld, secs=10):
 
 def nn(ld):
     img = cv2.imread("../assests/frame.jpg")
-    _, _, left_probs, right_probs = ld(img)
+    plt.imshow(img)
+    _, _, left_probs, right_probs, lane_center = ld(img)
     line_left = ld.fit_line_v_of_u(left_probs, 0.3)
     line_right = ld.fit_line_v_of_u(right_probs, 0.3)
 
-    return line_left, line_right
+    return line_left, line_right, lane_center
 
 
 def plot_detected_lines(ld, line_left, line_right):
@@ -65,6 +66,8 @@ def plot_detected_lines(ld, line_left, line_right):
 ld = LaneDetector(image_width=640, image_height=480)
 
 # run_preds(vid_cap, ld)
-line_left, line_right = nn(ld)
+line_left, line_right, lane_center, lane_deviation = nn(ld)
+print(f"Lane Center (X-coordinate): {lane_center} meters")
+print(f"Lane Deviation: {lane_deviation} meters")
 print(line_left, line_right)
 plot_detected_lines(ld, line_left, line_right)
