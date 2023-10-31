@@ -43,7 +43,7 @@ def run_preds(vid_cap, ld, secs=10):
 def nn(ld):
     img = cv2.imread("../assests/frame.jpg")
     plt.imshow(img)
-    _, _, left_probs, right_probs, lane_center = ld(img)
+    _, _, left_probs, right_probs, lane_center, _ = ld(img)
     line_left = ld.fit_line_v_of_u(left_probs, 0.3)
     line_right = ld.fit_line_v_of_u(right_probs, 0.3)
 

@@ -483,6 +483,26 @@ def calc_servo_and_motor_controls(curverad, center_diff):
     return front_servo_direction, motor_speed
 
 
+def calc_servo_and_motor_controls_with_centerdiff(
+    center_diff, center_diff_threshold=0.1
+):
+    # Calculate the front servo direction and motor speed based on curverad and center_diff
+    if center_diff > 0 and center_diff > center_diff_threshold:
+        # If the curverad is significant, steer based on curverad
+        front_servo_direction = "right"
+        motor_speed = 50
+    elif abs(center_diff) > center_diff_threshold:
+        # If the center difference is significant, steer based on center_diff
+        front_servo_direction = "left"
+        motor_speed = 50
+    else:
+        # If neither curverad nor center_diff is significant, go straight
+        front_servo_direction = "straight"
+        motor_speed = 100
+
+    return front_servo_direction, motor_speed
+
+
 if __name__ == "__main__":
     img = cv2.imread("../assests/road.jpg")
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

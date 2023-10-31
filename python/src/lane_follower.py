@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from algo_lane_follower import (
     calc_servo_and_motor_controls,
+    calc_servo_and_motor_controls_with_centerdiff,
     process_image,
 )
 from checks import create_video_capture, try_func
@@ -144,13 +145,10 @@ def run_robot_with_nn_algo(secs=10):
     vid_cap = create_video_capture(640, 480, 30)
     ld = LaneDetector(image_width=640, image_height=480)
     motors = ruspy.motors_init(50, 100)
-    motors.speed(100, 100)
-    # motors.forward(100)
-    time.sleep(0.5)
+    camera_servo_pin1, camera_servo_pin2, dir_servo_pin = ruspy.servos_init(
+        [80, 20, 60]
+    )
     frame_number = 0
-
-    # create black image to add left and right lanes
-    lane_img = np.zeros((480, 640, 3), dtype=np.uint8)
 
     while (time.time() - started) < secs:
         print("VIDEO CAPTURE STARTED")
@@ -159,43 +157,31 @@ def run_robot_with_nn_algo(secs=10):
             print("FRAME NOT CAPTURED")
             continue
         print("FRAME CAPTURED")
-        left_poly, right_poly, left, right, x_center = ld(frame)
-        lane_deviation = x_center - (lane_width / 2)
-        print(f"Lane Center (X-coordinate): {x_center} meters")
-        print(f"Lane Deviation: {lane_deviation} meters")
+        (
+            _,
+            _,
+            left_probs,
+            right_probs,
+            lane_center,
+            lane_deviation,
+        ) = ld(frame)
 
-        lane_img[left > 0.5, :] = [255, 255, 255]
-        lane_img[right > 0.5, :] = [255, 255, 255]
-        gray = cv2.cvtColor(lane_img, cv2.COLOR_BGR2GRAY)
-        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-        edged = cv2.Canny(blurred, 85, 85)
-        lines = cv2.HoughLinesP(edged, 1, np.pi / 180, 10, minLineLength, maxLineGap)
-        filename = f"out_{frame_number}.jpg"
-        cv2.imwrite(filename, lines)
+        (
+            front_servo_direction,
+            rear_motor_speed,
+        ) = calc_servo_and_motor_controls_with_centerdiff(lane_center, 0.1)
+        print(
+            f"{lane_center = }\n{lane_deviation = }\n{rear_motor_speed = }\n{front_servo_direction = }"
+        )
 
-        if lines is None:
-            print("NO LINES DETECTED")
+        if front_servo_direction == "left":
+            dir_servo_pin.angle(45)
+            motors.turn_left(rear_motor_speed)
+        elif front_servo_direction == "right":
+            dir_servo_pin.angle(75)
+            motors.turn_right(rear_motor_speed)
         else:
-            print("CALCULATE THETA")
-            theta = 0
-            for x in range(0, len(lines)):
-                for x1, y1, x2, y2 in lines[x]:
-                    # cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                    theta += math.atan2((y2 - y1), (x2 - x1))
-
-            print(theta)
-            threshold = 6
-            if theta > threshold:
-                print("LEFT")
-                motors.turn_left(100)
-            if theta < -threshold:
-                print("RIGHT")
-                motors.turn_right(100)
-            if abs(theta) < threshold:
-                print("STRAIGHT")
-                motors.forward(100)
-
-            theta = 0
+            motors.forward(rear_motor_speed)
 
         frame_number += 1
 
@@ -210,9 +196,9 @@ def run_robot_with_algo(secs=10):
     started = time.time()
     vid_cap = create_video_capture(640, 480, 30)
     motors = ruspy.motors_init(50, 100)
-    motors.speed(100, 100)
-    # motors.forward(100)
-    time.sleep(0.5)
+    camera_servo_pin1, camera_servo_pin2, dir_servo_pin = ruspy.servos_init(
+        [80, 20, 60]
+    )
     frame_number = 0
 
     while (time.time() - started) < secs:
@@ -235,8 +221,10 @@ def run_robot_with_algo(secs=10):
         )
 
         if front_servo_direction == "left":
+            dir_servo_pin.angle(45)
             motors.turn_left(rear_motor_speed)
         elif front_servo_direction == "right":
+            dir_servo_pin.angle(75)
             motors.turn_right(rear_motor_speed)
         else:
             motors.forward(rear_motor_speed)
