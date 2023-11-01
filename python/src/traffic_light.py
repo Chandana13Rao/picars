@@ -2,100 +2,113 @@ import cv2
 import numpy as np
 
 
-def detect(cv_img):
-    font = cv2.FONT_HERSHEY_SIMPLEX
+def detect_color(cv_img):
+    # calculate 2D histograms for pairs of channels: GR
+    histGR = cv2.calcHist([cv_img], [1, 2], None, [256, 256], [0, 256, 0, 256])
+
+    # histogram is float and counts need to be scale to range 0 to 255
+    # histScaled = (
+    #     exposure.rescale_intensity(histGR, in_range=(0, 1), out_range=(0, 255))
+    #     .clip(0, 255)
+    #     .astype(np.uint8)
+    # )
+    histScaled = (histGR * 255).clip(0, 255).astype(np.uint8)
+
+    # make masks
+    ww = 256
+    hh = 256
+    ww13 = ww // 3
+    ww23 = 2 * ww13
+    hh13 = hh // 3
+    hh23 = 2 * hh13
+    black = np.zeros_like(histScaled, dtype=np.uint8)
+    # specify points in OpenCV x,y format
+    ptsUR = np.array([[[ww13, 0], [ww - 1, hh23], [ww - 1, 0]]], dtype=np.int32)
+    redMask = black.copy()
+    cv2.fillPoly(redMask, ptsUR, (255, 255, 255))
+    ptsBL = np.array([[[0, hh13], [ww23, hh - 1], [0, hh - 1]]], dtype=np.int32)
+    greenMask = black.copy()
+    cv2.fillPoly(greenMask, ptsBL, (255, 255, 255))
+
+    # Test histogram against masks
+    region = cv2.bitwise_and(histScaled, histScaled, mask=redMask)
+    redCount = np.count_nonzero(region)
+    region = cv2.bitwise_and(histScaled, histScaled, mask=greenMask)
+    greenCount = np.count_nonzero(region)
+    print("redCount:", redCount)
+    print("greenCount:", greenCount)
+
+    # Find color
+    threshCount = 100
+    if redCount > greenCount and redCount > threshCount:
+        color = "red"
+    elif greenCount > redCount and greenCount > threshCount:
+        color = "green"
+    elif redCount < threshCount and greenCount < threshCount:
+        color = "yellow"
+    else:
+        color = "other"
+
+    # view results
+    # cv2.imshow("hist", histScaled)
+    # cv2.imshow("redMask", redMask)
+    # cv2.imshow("greenMask", greenMask)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+
+    return color
+
+
+def detect_traffic_light(cv_img):
     cimg = cv_img
-    hsv = cv2.cvtColor(cv_img, cv2.COLOR_BGR2HSV)
-
-    # color range
-    lower_red1 = np.array([0, 100, 100])
-    upper_red1 = np.array([10, 255, 255])
-    lower_red2 = np.array([160, 100, 100])
-    upper_red2 = np.array([180, 255, 255])
-    lower_green = np.array([40, 50, 50])
-    upper_green = np.array([90, 255, 255])
-    mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
-    mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
-    maskg = cv2.inRange(hsv, lower_green, upper_green)
-    maskr = cv2.add(mask1, mask2)
-
-    size = cv_img.shape
+    gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+    gray = cv2.medianBlur(gray, 5)
 
     # hough circle detect
-    r_circles = cv2.HoughCircles(
-        maskr,
+    circles = cv2.HoughCircles(
+        gray,
         cv2.HOUGH_GRADIENT,
         1,
-        80,
-        param1=50,
-        param2=10,
+        100,
+        param1=100,
+        param2=40,
         minRadius=0,
         maxRadius=30,
     )
 
-    g_circles = cv2.HoughCircles(
-        maskg,
-        cv2.HOUGH_GRADIENT,
-        1,
-        60,
-        param1=50,
-        param2=10,
-        minRadius=0,
-        maxRadius=30,
-    )
+    # If circles were detected, proceed with color detection
+    if circles is not None:
+        print(f"{len(circles[0]) = }")
+        for circle in circles[0]:
+            x, y, r = map(round, circle)
+            cv2.circle(cimg, (x, y), r, (0, 255, 0), 2)
+            # Extract the region around the circle
+            region_around_circle = cv_img[y - r : y + r, x - r : x + r]
+            color = detect_color(region_around_circle)
 
-    # traffic light detect
-    r = 5
-    bound = 4.0 / 10
-    if r_circles is not None:
-        r_circles = np.uint16(np.around(r_circles))
+            # Print the detected color for each circle
+            print(f"Circle at ({x}, {y}) is {color}")
+    else:
+        print("No circles detected")
+        color = "other"
+    # TODO: Major color extraction yet to be done
 
-        for i in r_circles[0, :]:
-            if i[0] > size[1] or i[1] > size[0] or i[1] > size[0] * bound:
-                continue
-
-            h, s = 0.0, 0.0
-            for m in range(-r, r):
-                for n in range(-r, r):
-                    if (i[1] + m) >= size[0] or (i[0] + n) >= size[1]:
-                        continue
-                    h += maskr[i[1] + m, i[0] + n]
-                    s += 1
-            if h / s > 50:
-                cv2.circle(cimg, (i[0], i[1]), i[2] + 10, (0, 255, 0), 2)
-                cv2.circle(maskr, (i[0], i[1]), i[2] + 30, (255, 255, 255), 2)
-                cv2.putText(
-                    cimg, "RED", (i[0], i[1]), font, 1, (255, 0, 0), 2, cv2.LINE_AA
-                )
-
-    if g_circles is not None:
-        g_circles = np.uint16(np.around(g_circles))
-
-        for i in g_circles[0, :]:
-            if i[0] > size[1] or i[1] > size[0] or i[1] > size[0] * bound:
-                continue
-
-            h, s = 0.0, 0.0
-            for m in range(-r, r):
-                for n in range(-r, r):
-                    if (i[1] + m) >= size[0] or (i[0] + n) >= size[1]:
-                        continue
-                    h += maskg[i[1] + m, i[0] + n]
-                    s += 1
-            if h / s > 100:
-                cv2.circle(cimg, (i[0], i[1]), i[2] + 10, (0, 255, 0), 2)
-                cv2.circle(maskg, (i[0], i[1]), i[2] + 30, (255, 255, 255), 2)
-                cv2.putText(
-                    cimg, "GREEN", (i[0], i[1]), font, 1, (255, 0, 0), 2, cv2.LINE_AA
-                )
-
-    return len(r_circles) == 0 and len(g_circles) == 1
+    return color, cimg
 
 
 if __name__ == "__main__":
-    cv_img = cv2.imread("../assests/red.jpg")
-    is_green = detect(cv_img)
-    if is_green:
-        print("GREEN light detected")
-    else:
-        print("RED light detected")
+    filenames = [
+        "../assests/traffic_light_red",
+        "../assests/traffic_light_green",
+        "../assests/traffic_light_yellow",
+        "../assests/red",
+    ]
+
+    for filename in filenames:
+        print(filename)
+        # read image
+        cv_img = cv2.imread(filename + ".jpg")
+        print("*****************************************")
+        _, cimg = detect_traffic_light(cv_img)
+        cv2.imwrite(filename + "_circles.jpg", cimg)
+        print("*****************************************")
