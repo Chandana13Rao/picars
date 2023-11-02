@@ -30,12 +30,14 @@ def create_video_capture(h=224, w=224, fps=10):
 
 
 def detect_green(vid_cap, max_time_limit):
+    _, camera_servo_pin2, _ = ruspy.servos_init([80, 30, 60])
     start_time = time.time()
 
     while True:
         # Check Max time limit
         if time.time() - start_time >= max_time_limit:
             print("MAX TIME LIMIT EXCEEDED")
+            camera_servo_pin2.angle(50)
             return False
 
         # Run till Green light is detected
@@ -47,4 +49,5 @@ def detect_green(vid_cap, max_time_limit):
             continue
 
         # Green light detected
+        camera_servo_pin2.angle(50)
         return True
