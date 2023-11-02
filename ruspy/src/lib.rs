@@ -35,6 +35,13 @@ fn reset_mcu() -> Result<()> {
 }
 
 #[pyfunction]
+pub fn reset_user() -> Result<bool> {
+    let usr_rst_pin = Gpio::new()?.get(25)?.into_input();
+
+    Ok(usr_rst_pin.is_high())
+}
+
+#[pyfunction]
 pub fn main_init() -> Result<()> {
     // RESET MCU
     reset_mcu().context("MCU RESET UNSUCCESSFULL [BEGIN]")?;

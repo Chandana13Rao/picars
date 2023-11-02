@@ -1,4 +1,4 @@
-import signal
+import threading
 import time
 from functools import partial
 
@@ -9,12 +9,12 @@ from utils import create_video_capture, detect_green, try_func
 import ruspy
 
 
-class KeyboardInterruptError(Exception):
-    pass
-
-
-def signal_handler(sig, frame):
-    raise KeyboardInterruptError("Ctrl+C pressed. Exiting...")
+def check_user_input():
+    while True:
+        if ruspy.reset_user():
+            global exit_flag
+            exit_flag = True  # Set the exit flag to True
+            break
 
 
 def run_forward(secs, speed, wobble_secs=0.1):
@@ -34,22 +34,35 @@ def run_forward(secs, speed, wobble_secs=0.1):
         time.sleep(wobble_secs)
 
 
-if __name__ == "__main__":
-    # Set up a Ctrl+C signal handler
-    signal.signal(signal.SIGINT, signal_handler)
+def main():
     try:
-        vid_cap = create_video_capture(640, 480, fps=30)
-        # run_forward = partial(run_forward, secs=60, speed=100)
-        run_robot_with_theta = partial(
-            run_robot_with_theta, secs=10, threshold=6, w=640, h=480, fps=30
-        )
+        while not exit_flag:
+            vid_cap = create_video_capture(640, 480, fps=30)
+            # run_forward = partial(run_forward, secs=60, speed=100)
+            run_robot = partial(
+                run_robot_with_theta, secs=10, threshold=6, w=640, h=480, fps=30
+            )
 
-        if detect_green(vid_cap, max_time_limit=10):
-            try_func(run_robot_with_theta)
-        else:
-            print("SORRY,  I didn't get the GREEN signal")
-    except KeyboardInterruptError:
-        ruspy.reset_mcu()
+            if detect_green(vid_cap, max_time_limit=10):
+                try_func(run_robot)
+            else:
+                print("SORRY,  I didn't get the GREEN signal")
     except Exception as ex:
         print("An error occurred:", ex, flush=True)
         ruspy.reset_mcu()
+
+
+if __name__ == "__main__":
+    exit_flag = False
+
+    # Start a separate thread to periodically check user input
+    input_thread = threading.Thread(target=check_user_input)
+    input_thread.start()
+    # Run the main code in the main thread
+    main()
+    # Wait for the input thread to finish
+    input_thread.join()
+
+    if exit_flag:
+        ruspy.reset_mcu()
+        print("USER EXIT")
