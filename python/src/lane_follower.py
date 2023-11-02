@@ -25,7 +25,7 @@ def run_robot_with_theta(secs=10):
     print("RUNNING ROBOT WITH THETA CALCULATIONS")
     print("*************************************")
     started = time.time()
-    vid_cap = create_video_capture(480, 640, 30)
+    vid_cap = create_video_capture(640, 480, 30)
     motors = ruspy.motors_init(50, 100)
     motors.speed(100, 100)
     # motors.forward(100)
@@ -81,8 +81,10 @@ def run_robot_with_nn(secs=10):
     print("RUNNING ROBOT WITH MACHINE LEARNING")
     print("***********************************")
     started = time.time()
-    vid_cap = create_video_capture(480, 640, 30)
+    vid_cap = create_video_capture(640, 480, 2)
     ld = LaneDetector(image_width=640, image_height=480)
+    # vid_cap = create_video_capture(1024, 512, 2)
+    # ld = LaneDetector(image_width=1024, image_height=512)
     motors = ruspy.motors_init(50, 100)
     motors.speed(100, 100)
     # motors.forward(100)
@@ -90,7 +92,7 @@ def run_robot_with_nn(secs=10):
     frame_number = 0
 
     # create black image to add left and right lanes
-    lane_img = np.zeros((480, 640, 3), dtype=np.uint8)
+    lane_img = np.zeros((640, 480, 3), dtype=np.uint8)
 
     while (time.time() - started) < secs:
         print("VIDEO CAPTURE STARTED")
@@ -144,8 +146,10 @@ def run_robot_with_nn_algo(secs=10):
     print("RUNNING ROBOT WITH MACHINE LEARNING")
     print("***********************************")
     started = time.time()
-    vid_cap = create_video_capture(480, 640, 2)
+    vid_cap = create_video_capture(640, 480, 2)
     ld = LaneDetector(image_width=640, image_height=480)
+    # vid_cap = create_video_capture(1024, 512, 2)
+    # ld = LaneDetector(image_width=1024, image_height=512)
     motors = ruspy.motors_init(50, 100)
     camera_servo_pin1, camera_servo_pin2, dir_servo_pin = ruspy.servos_init(
         [80, 50, 60]
@@ -196,7 +200,7 @@ def run_robot_with_algo(secs=10):
     print("RUNNING ROBOT WITH SIMPLE ALGORITHM")
     print("***********************************")
     started = time.time()
-    vid_cap = create_video_capture(480, 640, 30)
+    vid_cap = create_video_capture(640, 480, 30)
     motors = ruspy.motors_init(50, 100)
     camera_servo_pin1, camera_servo_pin2, dir_servo_pin = ruspy.servos_init(
         [80, 50, 60]
