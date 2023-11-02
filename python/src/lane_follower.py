@@ -76,7 +76,7 @@ def run_robot_with_theta(secs=10):
     motors.stop()
 
 
-def run_robot_with_nn(secs=10):
+def run_robot_with_nn(secs=10, prob=0.3):
     print("***********************************")
     print("RUNNING ROBOT WITH MACHINE LEARNING")
     print("***********************************")
@@ -102,13 +102,15 @@ def run_robot_with_nn(secs=10):
             continue
         print("FRAME CAPTURED")
         _, _, left, right, _ = ld(frame)
-        lane_img[left > 0.5, :] = [255, 255, 255]
-        lane_img[right > 0.5, :] = [255, 255, 255]
+        lane_img[left > prob, :] = [255, 255, 255]
+        lane_img[right > prob, :] = [255, 255, 255]
+        filename = f"out_{frame_number}.jpg"
+        cv2.imwrite(filename, lane_img)
         gray = cv2.cvtColor(lane_img, cv2.COLOR_BGR2GRAY)
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
         edged = cv2.Canny(blurred, 85, 85)
         lines = cv2.HoughLinesP(edged, 1, np.pi / 180, 10, minLineLength, maxLineGap)
-        filename = f"out_{frame_number}.jpg"
+        filename = f"lines_{frame_number}.jpg"
         cv2.imwrite(filename, lines)
 
         if lines is None:
@@ -141,7 +143,7 @@ def run_robot_with_nn(secs=10):
     motors.stop()
 
 
-def run_robot_with_nn_algo(secs=10):
+def run_robot_with_nn_algo(secs=10, prob=0.3):
     print("***********************************")
     print("RUNNING ROBOT WITH MACHINE LEARNING")
     print("***********************************")
@@ -171,6 +173,10 @@ def run_robot_with_nn_algo(secs=10):
             lane_center,
             lane_deviation,
         ) = ld(frame)
+        frame[left_probs > prob, :] = [0, 0, 255]  # blue
+        frame[right_probs > prob, :] = [255, 0, 0]  # red
+        filename = f"out_{frame_number}.jpg"
+        cv2.imwrite(filename, frame)
 
         (
             front_servo_direction,
