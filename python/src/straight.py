@@ -1,10 +1,10 @@
 import threading
 import time
-from functools import partial
+import traceback
 
 import rustimport.import_hook  # noqa: F401
 from lane_follower import run_robot_with_theta
-from utils import create_video_capture, detect_green, try_func
+from utils import create_video_capture, detect_green
 
 import ruspy
 
@@ -35,24 +35,24 @@ def run_forward(secs, speed, wobble_secs=0.1):
 
 
 def main(max_time_limit=30):
-    start_time = time.time()
+    ruspy.main_init()
+    motors = ruspy.motors_init(50, 100)
+    _, _, ms = ruspy.servos_init()
+    print("MAIN INIT SUCCESSFULL")
     try:
-        # max_time_limit=0 acts as infinite loop to check only exit_flag
-        while not (
-            max_time_limit > 0 and time.time() - start_time >= max_time_limit
-        ) and not exit_flag:
-            vid_cap = create_video_capture(640, 480, fps=30)
-            # run_forward = partial(run_forward, secs=60, speed=100)
-            run_robot = partial(
-                run_robot_with_theta, secs=10, threshold=6, w=640, h=480, fps=30
-            )
-            print("DETECTING TRAFFIC LIGHTS")
-            if detect_green(vid_cap, max_time_limit=10):
-                try_func(run_robot)
-            else:
-                print("SORRY,  I didn't get the GREEN signal")
-        ruspy.reset_mcu()
-        print("ROBOT DEAD")
+        vid_cap = create_video_capture(640, 480, fps=30)
+        # run_forward = partial(run_forward, secs=60, speed=100)
+        if detect_green(vid_cap, max_time_limit=10):
+            try:
+                run_robot_with_theta(vid_cap, motors, ms, exit_flag, max_time_limit, 6)
+            except Exception as e:
+                print(f"ERROR in run_robot_with_theta: {e}")
+                traceback.print_exc()
+                ruspy.reset_mcu()
+        else:
+            print("SORRY,  I didn't get the GREEN signal")
+            ruspy.reset_mcu()
+            print("ROBOT DEAD")
     except Exception as ex:
         print("An error occurred:", ex, flush=True)
         ruspy.reset_mcu()

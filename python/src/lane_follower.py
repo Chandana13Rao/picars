@@ -20,20 +20,19 @@ maxLineGap = 10
 lane_width = 0.36  # 36 cms
 
 
-def run_robot_with_theta(secs=10, threshold=6, w=640, h=480, fps=30):
+def run_robot_with_theta(
+    vid_cap, motors, ms, exit_flag, max_time_limit=30, threshold=6
+):
     print("*************************************")
     print("RUNNING ROBOT WITH THETA CALCULATIONS")
     print("*************************************")
-    started = time.time()
-    vid_cap = create_video_capture(w, h, fps)
-    motors = ruspy.motors_init(50, 100)
-    _, _, ms = ruspy.servos_init()
-    # motors.speed(100, 100)
-    # motors.forward(100)
-    # time.sleep(0.5)
+    start_time = time.time()
     frame_number = 0
 
-    while (time.time() - started) < secs:
+    # max_time_limit=0 acts as infinite loop to check only exit_flag
+    while not (
+        max_time_limit > 0 and time.time() - start_time >= max_time_limit
+    ) and not exit_flag:
         print("VIDEO CAPTURE STARTED")
         ret, frame = vid_cap.read()
         if not ret:
