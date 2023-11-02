@@ -24,7 +24,15 @@ fn reset_mcu() -> Result<()> {
     // } else {
     //     5
     // };
-    let mut rst_pin = Gpio::new()?.get(5)?.into_output();
+    //   "RST": 16
+    //  "MCURST":  5
+    let mut mcu_rst_pin = Gpio::new()?.get(5)?.into_output();
+    let mut rst_pin = Gpio::new()?.get(16)?.into_output();
+
+    mcu_rst_pin.set_low();
+    sleep(Duration::from_millis(1));
+    mcu_rst_pin.set_high();
+    sleep(Duration::from_millis(1));
 
     rst_pin.set_low();
     sleep(Duration::from_millis(1));
