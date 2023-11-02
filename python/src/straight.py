@@ -2,7 +2,7 @@ import time
 from functools import partial
 
 import rustimport.import_hook  # noqa: F401
-from traffic_light import detect
+from traffic_light import detect_traffic_light
 from utils import create_video_capture, try_func
 
 import ruspy
@@ -22,7 +22,7 @@ def detect_green(vid_cap, max_time_limit):
         if not ret:
             print("FRAME NOT CAPTURED")
             continue
-        if not detect(cv_image):
+        if not detect_traffic_light(cv_image):
             continue
 
         # Green light detected

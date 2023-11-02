@@ -4,7 +4,7 @@ import traceback
 import cv2
 import rustimport.import_hook  # noqa: F401
 from lane_detector import LaneDetector
-from traffic_light import detect
+from traffic_light import detect_traffic_light
 
 import ruspy
 
@@ -128,7 +128,7 @@ def run_preds(vid_cap, ld):
         print("FRAME NOT CAPTURED")
         return None
 
-    detect(cv_image)
+    detect_traffic_light(cv_image)
     left_poly, right_poly, left, right = ld(cv_image)
     print(f"{left_poly = } {right_poly = }\n{left.shape = } {right.shape = }")
 
