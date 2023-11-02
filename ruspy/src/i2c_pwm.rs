@@ -14,7 +14,7 @@ const REG_PER: u8 = 0x44; // REG_ARR
 const SLAVE_ADDR: u16 = 0x14;
 // const CLOCK: u32 = 72_000_000;
 
-pub fn map_range(from_range: (i32, i32), to_range: (i32, i32), s: i32) -> i32 {
+pub fn map_range(from_range: (f32, f32), to_range: (f32, f32), s: f32) -> f32 {
     to_range.0 + (s - from_range.0) * (to_range.1 - to_range.0) / (from_range.1 - from_range.0)
 }
 

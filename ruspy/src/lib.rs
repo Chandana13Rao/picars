@@ -45,7 +45,7 @@ pub fn main_init() -> Result<()> {
 }
 
 #[pyfunction]
-pub fn servos_init(init_angles: [i32; 3]) -> Result<[Servo; 3]> {
+pub fn servos_init(init_angles: [f32; 3]) -> Result<[Servo; 3]> {
     let mut camera_servo_pin1 = Servo::new(0).context("camera_servo_pin1 init failed")?; // P0
     let mut camera_servo_pin2 = Servo::new(1).context("camera_servo_pin2 init failed")?; // P1
     let mut dir_servo_pin = Servo::new(2).context("dir_servo_pin init failed")?; // P2
