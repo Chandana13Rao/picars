@@ -19,7 +19,7 @@ def signal_handler(sig, frame):
 def run_forward(secs, speed, wobble_secs=0.1):
     motors = ruspy.motors_init(50, 100)
     toggle_angle = True  # Used to alternate between 59.0 and 58.9
-    _, _, ms = ruspy.servos_init([80.0, 50.0, 59.0])
+    _, _, ms = ruspy.servos_init()
     motors.forward(speed)
 
     start_time = time.time()

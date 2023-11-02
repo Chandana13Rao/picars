@@ -27,7 +27,7 @@ def run_robot_with_theta(secs=10):
     started = time.time()
     vid_cap = create_video_capture(640, 480, 30)
     motors = ruspy.motors_init(50, 100)
-    _, _, ms = ruspy.servos_init([-90.0, 50.0, 60.0])
+    _, _, ms = ruspy.servos_init()
     # motors.speed(100, 100)
     # motors.forward(100)
     # time.sleep(0.5)
@@ -89,7 +89,7 @@ def run_robot_with_nn(secs=20, prob=0.1):
     # vid_cap = create_video_capture(1024, 512, 2)
     # ld = LaneDetector(image_width=1024, image_height=512)
     motors = ruspy.motors_init(50, 100)
-    _, _, ms = ruspy.servos_init([-90.0, 50.0, 60.0])
+    _, _, ms = ruspy.servos_init()
     # motors.speed(100, 100)
     # motors.forward(100)
     # time.sleep(0.5)
@@ -159,9 +159,7 @@ def run_robot_with_nn_algo(secs=20, prob=0.1):
     # vid_cap = create_video_capture(1024, 512, 2)
     # ld = LaneDetector(image_width=1024, image_height=512)
     motors = ruspy.motors_init(50, 100)
-    camera_servo_pin1, camera_servo_pin2, dir_servo_pin = ruspy.servos_init(
-        [80.0, 50.0, 60.0]
-    )
+    camera_servo_pin1, camera_servo_pin2, dir_servo_pin = ruspy.servos_init()
     frame_number = 0
 
     while (time.time() - started) < secs:
@@ -214,9 +212,7 @@ def run_robot_with_algo(secs=10):
     started = time.time()
     vid_cap = create_video_capture(640, 480, 30)
     motors = ruspy.motors_init(50, 100)
-    camera_servo_pin1, camera_servo_pin2, dir_servo_pin = ruspy.servos_init(
-        [80.0, 50.0, 60.0]
-    )
+    camera_servo_pin1, camera_servo_pin2, dir_servo_pin = ruspy.servos_init()
     frame_number = 0
 
     while (time.time() - started) < secs:

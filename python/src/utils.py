@@ -30,7 +30,7 @@ def create_video_capture(w=224, h=224, fps=10):
 
 
 def detect_green(vid_cap, max_time_limit):
-    _, camera_servo_pin2, _ = ruspy.servos_init([80.0, 30.0, 60.0])
+    _, camera_servo_pin2, _ = ruspy.servos_init()
     start_time = time.time()
 
     while True:

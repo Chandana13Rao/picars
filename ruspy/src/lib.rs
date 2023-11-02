@@ -45,14 +45,10 @@ pub fn main_init() -> Result<()> {
 }
 
 #[pyfunction]
-pub fn servos_init(init_angles: [f32; 3]) -> Result<[Servo; 3]> {
-    let mut camera_servo_pin1 = Servo::new(0).context("camera_servo_pin1 init failed")?; // P0
-    let mut camera_servo_pin2 = Servo::new(1).context("camera_servo_pin2 init failed")?; // P1
-    let mut dir_servo_pin = Servo::new(2).context("dir_servo_pin init failed")?; // P2
-    camera_servo_pin1.angle(init_angles[0]);
-    camera_servo_pin2.angle(init_angles[1]);
-    dir_servo_pin.angle(init_angles[2]);
-
+pub fn servos_init() -> Result<[Servo; 3]> {
+    let camera_servo_pin1 = Servo::new(0).context("camera_servo_pin1 init failed")?; // P0
+    let camera_servo_pin2 = Servo::new(1).context("camera_servo_pin2 init failed")?; // P1
+    let dir_servo_pin = Servo::new(2).context("dir_servo_pin init failed")?; // P2
     Ok([camera_servo_pin1, camera_servo_pin2, dir_servo_pin])
 }
 

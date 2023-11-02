@@ -45,9 +45,7 @@ def servos_check():
     camera_servo_pin2 (Up-Down Servo)    : [      0(up) ,   45  ,        90(down)]
     dir_servo_pin (Front motor Servo)    : [      30    ,   60  ,        90      ]
     """
-    camera_servo_pin1, camera_servo_pin2, dir_servo_pin = ruspy.servos_init(
-        [80.0, 45.0, 60.0]
-    )
+    camera_servo_pin1, camera_servo_pin2, dir_servo_pin = ruspy.servos_init()
     camera_servo_pin1.angle(90)
     time.sleep(1)
     camera_servo_pin2.angle(90)
@@ -59,9 +57,7 @@ def servos_check():
 # Motors Direction check
 def motors_dir_check():
     motors = ruspy.motors_init(50, 100)
-    camera_servo_pin1, camera_servo_pin2, dir_servo_pin = ruspy.servos_init(
-        [80.0, 45.0, 60.0]
-    )
+    camera_servo_pin1, camera_servo_pin2, dir_servo_pin = ruspy.servos_init()
     # Left amnd right turns will just move forward, direction should be controlled by Servos
     dir_servo_pin.angle(45)
     motors.turn_left(100)
