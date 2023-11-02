@@ -1,3 +1,5 @@
+from collections import Counter
+
 import cv2
 import numpy as np
 
@@ -63,6 +65,7 @@ def detect_traffic_light(cv_img):
     cimg = cv_img
     gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
     gray = cv2.medianBlur(gray, 5)
+    colors = []
 
     # hough circle detect
     circles = cv2.HoughCircles(
@@ -85,15 +88,25 @@ def detect_traffic_light(cv_img):
             # Extract the region around the circle
             region_around_circle = cv_img[y - r : y + r, x - r : x + r]
             color = detect_color(region_around_circle)
+            colors.append(color)
 
             # Print the detected color for each circle
             print(f"Circle at ({x}, {y}) is {color}")
     else:
         print("No circles detected")
         color = "other"
-    # TODO: Major color extraction yet to be done
 
-    return color, cimg
+    color_counts = Counter(colors)
+    red_count = color_counts["red"]
+    green_count = color_counts["green"]
+    print(f"Red count: {red_count}")
+    print(f"Green count: {green_count}")
+    is_green = red_count < green_count
+    print(f"Red count: {red_count}")
+    print(f"Green count: {green_count}")
+    print(f"{is_green = }")
+
+    return is_green, cimg
 
 
 if __name__ == "__main__":
