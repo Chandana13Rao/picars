@@ -20,12 +20,12 @@ maxLineGap = 10
 lane_width = 0.36  # 36 cms
 
 
-def run_robot_with_theta(secs=10):
+def run_robot_with_theta(secs=10, threshold=6, w=640, h=480, fps=30):
     print("*************************************")
     print("RUNNING ROBOT WITH THETA CALCULATIONS")
     print("*************************************")
     started = time.time()
-    vid_cap = create_video_capture(640, 480, 30)
+    vid_cap = create_video_capture(w, h, fps)
     motors = ruspy.motors_init(50, 100)
     _, _, ms = ruspy.servos_init()
     # motors.speed(100, 100)
@@ -55,8 +55,7 @@ def run_robot_with_theta(secs=10):
                     cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                     theta += math.atan2((y2 - y1), (x2 - x1))
 
-            print(theta)
-            threshold = 6
+            print(f"{theta: .3f}")
             if theta > threshold:
                 print("LEFT")
                 ms.angle(45)

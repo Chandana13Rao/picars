@@ -3,6 +3,7 @@ import time
 from functools import partial
 
 import rustimport.import_hook  # noqa: F401
+from lane_follower import run_robot_with_theta
 from utils import create_video_capture, detect_green, try_func
 
 import ruspy
@@ -38,10 +39,13 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
     try:
         vid_cap = create_video_capture(640, 480, fps=30)
-        run_forward = partial(run_forward, secs=60, speed=100)
+        # run_forward = partial(run_forward, secs=60, speed=100)
+        run_robot_with_theta = partial(
+            run_robot_with_theta, secs=10, threshold=6, w=640, h=480, fps=30
+        )
 
         if detect_green(vid_cap, max_time_limit=10):
-            try_func(run_forward)
+            try_func(run_robot_with_theta)
         else:
             print("SORRY,  I didn't get the GREEN signal")
     except KeyboardInterruptError:
