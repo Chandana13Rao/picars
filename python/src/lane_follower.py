@@ -1,4 +1,6 @@
 import math
+import signal
+import sys
 import time
 
 import cv2
@@ -232,29 +234,46 @@ def run_robot_with_algo(secs=10):
         frame_number += 1
 
 
+class KeyboardInterruptError(Exception):
+    pass
+
+
+def signal_handler(sig, frame):
+    raise KeyboardInterruptError("Ctrl+C pressed. Exiting...")
+
+
 if __name__ == "__main__":
-    import sys
+    # Set up a Ctrl+C signal handler
+    signal.signal(signal.SIGINT, signal_handler)
 
-    if len(sys.argv) < 2:
-        print(
-            """Usage: python lane_follower.py <run_type>
-                  <run_type> can take one of following values:
-                  (theta, nn, nn-algo, algo)"""
-        )
-        sys.exit(1)
-    run_type = sys.argv[1]
+    try:
+        if len(sys.argv) < 2:
+            print(
+                """Usage: python lane_follower.py <run_type>
+                    <run_type> can take one of following values:
+                    (theta, nn, nn-algo, algo)"""
+            )
+            sys.exit(1)
+        run_type = sys.argv[1]
 
-    ruspy.main_init()
-    if run_type == "theta":
-        try_func(run_robot_with_theta)
-    elif run_type == "nn":
-        try_func(run_robot_with_nn)
-    elif run_type == "algo":
-        try_func(run_robot_with_algo)
-    else:
-        print(
-            """Usage: python lane_follower.py <run_type>
-                  <run_type> can take one of following values:
-                  (theta, nn, nn-algo, algo)"""
-        )
-    ruspy.reset_mcu()
+        ruspy.main_init()
+        if run_type == "theta":
+            try_func(run_robot_with_theta)
+        elif run_type == "nn":
+            try_func(run_robot_with_nn)
+        elif run_type == "algo":
+            try_func(run_robot_with_algo)
+        elif run_type == "nn-algo":
+            try_func(run_robot_with_nn_algo)
+        else:
+            print(
+                """Usage: python lane_follower.py <run_type>
+                    <run_type> can take one of following values:
+                    (theta, nn, nn-algo, algo)"""
+            )
+        ruspy.reset_mcu()
+    except KeyboardInterruptError:
+        ruspy.reset_mcu()
+    except Exception as ex:
+        print("An error occurred:", ex, flush=True)
+        ruspy.reset_mcu()
