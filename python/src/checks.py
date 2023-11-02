@@ -1,10 +1,10 @@
 import time
 import traceback
 
-import cv2
 import rustimport.import_hook  # noqa: F401
 from lane_detector import LaneDetector
 from traffic_light import detect_traffic_light
+from utils import create_video_capture
 
 import ruspy
 
@@ -80,16 +80,6 @@ def motors_dir_check():
     time.sleep(2)
 
     motors.stop()
-
-
-# Cameras example check
-def create_video_capture(h=224, w=224, fps=10):
-    vid_cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
-    vid_cap.set(cv2.CAP_PROP_FRAME_WIDTH, h)
-    vid_cap.set(cv2.CAP_PROP_FRAME_HEIGHT, w)
-    vid_cap.set(cv2.CAP_PROP_FPS, fps)
-
-    return vid_cap
 
 
 def run_preds_with_fps(vid_cap, ld, secs=10):

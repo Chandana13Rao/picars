@@ -10,8 +10,8 @@ from algo_lane_follower import (
     calc_servo_and_motor_controls_with_centerdiff,
     process_image,
 )
-from checks import create_video_capture, try_func
 from lane_detector import LaneDetector
+from utils import create_video_capture, try_func
 
 import ruspy
 
