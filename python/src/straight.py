@@ -16,10 +16,15 @@ def signal_handler(sig, frame):
     raise KeyboardInterruptError("Ctrl+C pressed. Exiting...")
 
 
-def run_forward(secs, speed):
+def run_forward(secs, speed, wobble_secs=1):
     motors = ruspy.motors_init(50, 100)
+    _, _, ms = ruspy.servos_init([80.0, 50.0, 59.0])
     motors.forward(speed)
-    time.sleep(secs)
+
+    start_time = time.time()
+    while time.time() - start_time < secs:
+        ms.angle(59.0)
+        time.sleep(wobble_secs)
 
 
 if __name__ == "__main__":
