@@ -82,8 +82,8 @@ class LaneDetector:
         left_poly, right_poly, left_probs, right_probs = self.get_fit_and_probs(
             cv_image
         )
-        line_left = self.fit_line_v_of_u(left_probs, 0.3)
-        line_right = self.fit_line_v_of_u(right_probs, 0.3)
+        line_left = self.fit_line_v_of_u(left_probs, 0.1)
+        line_right = self.fit_line_v_of_u(right_probs, 0.1)
         lane_center, _ = self.get_intersection(line_left, line_right)
         lane_deviation = lane_center - (self.lane_width / 2)
 

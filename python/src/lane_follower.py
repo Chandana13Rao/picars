@@ -43,8 +43,6 @@ def run_robot_with_theta(secs=10):
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
         edged = cv2.Canny(blurred, 85, 85)
         lines = cv2.HoughLinesP(edged, 1, np.pi / 180, 10, minLineLength, maxLineGap)
-        filename = f"out_{frame_number}.jpg"
-        cv2.imwrite(filename, lines)
 
         if lines is None:
             print("NO LINES DETECTED")
@@ -53,7 +51,7 @@ def run_robot_with_theta(secs=10):
             theta = 0
             for x in range(0, len(lines)):
                 for x1, y1, x2, y2 in lines[x]:
-                    # cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                     theta += math.atan2((y2 - y1), (x2 - x1))
 
             print(theta)
@@ -70,13 +68,15 @@ def run_robot_with_theta(secs=10):
 
             theta = 0
 
+        filename = f"out_{frame_number}.jpg"
+        cv2.imwrite(filename, frame)
         frame_number += 1
 
     print("STOPPING MOTORS")
     motors.stop()
 
 
-def run_robot_with_nn(secs=10, prob=0.3):
+def run_robot_with_nn(secs=20, prob=0.1):
     print("***********************************")
     print("RUNNING ROBOT WITH MACHINE LEARNING")
     print("***********************************")
@@ -86,13 +86,13 @@ def run_robot_with_nn(secs=10, prob=0.3):
     # vid_cap = create_video_capture(1024, 512, 2)
     # ld = LaneDetector(image_width=1024, image_height=512)
     motors = ruspy.motors_init(50, 100)
-    motors.speed(100, 100)
+    # motors.speed(100, 100)
     # motors.forward(100)
     time.sleep(0.5)
     frame_number = 0
 
     # create black image to add left and right lanes
-    lane_img = np.zeros((640, 480, 3), dtype=np.uint8)
+    lane_img = np.zeros((480, 640, 3), dtype=np.uint8)
 
     while (time.time() - started) < secs:
         print("VIDEO CAPTURE STARTED")
@@ -101,7 +101,7 @@ def run_robot_with_nn(secs=10, prob=0.3):
             print("FRAME NOT CAPTURED")
             continue
         print("FRAME CAPTURED")
-        _, _, left, right, _ = ld(frame)
+        _, _, left, right, _, _ = ld(frame)
         lane_img[left > prob, :] = [255, 255, 255]
         lane_img[right > prob, :] = [255, 255, 255]
         filename = f"out_{frame_number}.jpg"
@@ -143,7 +143,7 @@ def run_robot_with_nn(secs=10, prob=0.3):
     motors.stop()
 
 
-def run_robot_with_nn_algo(secs=10, prob=0.3):
+def run_robot_with_nn_algo(secs=20, prob=0.1):
     print("***********************************")
     print("RUNNING ROBOT WITH MACHINE LEARNING")
     print("***********************************")

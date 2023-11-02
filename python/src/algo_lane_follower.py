@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tracker import tracker
 
-bot_width = 0.76  # percentage of bottom trapezoidal height
-mid_width = 0.08  # percentage of mid trapezoidal height
+bot_width = 0.14  # percentage of bottom trapezoidal height
+mid_width = 0.50  # percentage of mid trapezoidal height
 height_pct = 0.62  # percentage of trapezoidal height
-bottom_trim = 0.935  # percentage from top to bottom avoiding the hood of the car
+bottom_trim = 0  # percentage from top to bottom avoiding the hood of the car
 
 
 # Define a function that takes an image, gradient orientation,
