@@ -10,7 +10,7 @@ use std::thread::sleep;
 use std::time::Duration;
 
 use anyhow::{Context, Result};
-use rppal::gpio::Gpio;
+use rppal::gpio::{Gpio, Level, Trigger};
 
 use depth::Ultrasonic;
 use drive::{Motors, Servo};
@@ -44,9 +44,21 @@ fn reset_mcu() -> Result<()> {
 
 #[pyfunction]
 pub fn reset_user() -> Result<bool> {
-    let usr_rst_pin = Gpio::new()?.get(25)?.into_input();
+    let mut usr_rst_pin = Gpio::new()?.get(25)?.into_input();
 
-    Ok(usr_rst_pin.is_high())
+    // Set up a rising edge trigger on pin 25
+    usr_rst_pin
+        .set_interrupt(Trigger::FallingEdge)
+        .context("Setting Interrupt failed")?;
+
+    let mut usr_out = false;
+
+    // Monitor the USR button for a faling edge
+    while let Ok(Some(Level::Low)) = usr_rst_pin.poll_interrupt(false, None) {
+        usr_out = true;
+    }
+
+    Ok(usr_out)
 }
 
 #[pyfunction]
