@@ -26,7 +26,7 @@ if __name__ == "__main__":
     # Set up a Ctrl+C signal handler
     signal.signal(signal.SIGINT, signal_handler)
     try:
-        vid_cap = create_video_capture(h=480, w=640, fps=30)
+        vid_cap = create_video_capture(640, 480, fps=30)
         run_forward = partial(run_forward, secs=60, speed=100)
 
         if detect_green(vid_cap, max_time_limit=10):
