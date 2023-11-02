@@ -34,9 +34,13 @@ def run_forward(secs, speed, wobble_secs=0.1):
         time.sleep(wobble_secs)
 
 
-def main():
+def main(max_time_limit=30):
+    start_time = time.time()
     try:
-        while not exit_flag:
+        # max_time_limit=0 acts as infinite loop to check only exit_flag
+        while not (
+            max_time_limit > 0 and time.time() - start_time >= max_time_limit
+        ) and not exit_flag:
             vid_cap = create_video_capture(640, 480, fps=30)
             # run_forward = partial(run_forward, secs=60, speed=100)
             run_robot = partial(
@@ -47,6 +51,7 @@ def main():
                 try_func(run_robot)
             else:
                 print("SORRY,  I didn't get the GREEN signal")
+        ruspy.reset_mcu()
     except Exception as ex:
         print("An error occurred:", ex, flush=True)
         ruspy.reset_mcu()
@@ -59,7 +64,7 @@ if __name__ == "__main__":
     input_thread = threading.Thread(target=check_user_input)
     input_thread.start()
     # Run the main code in the main thread
-    main()
+    main(max_time_limit=30)
     # Wait for the input thread to finish
     input_thread.join()
 
