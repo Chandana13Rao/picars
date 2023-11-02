@@ -16,14 +16,20 @@ def signal_handler(sig, frame):
     raise KeyboardInterruptError("Ctrl+C pressed. Exiting...")
 
 
-def run_forward(secs, speed, wobble_secs=1):
+def run_forward(secs, speed, wobble_secs=0.1):
     motors = ruspy.motors_init(50, 100)
+    toggle_angle = True  # Used to alternate between 59.0 and 58.9
     _, _, ms = ruspy.servos_init([80.0, 50.0, 59.0])
     motors.forward(speed)
 
     start_time = time.time()
     while time.time() - start_time < secs:
-        ms.angle(59.0)
+        if toggle_angle:
+            ms.angle(59.0)
+            toggle_angle = False
+        else:
+            ms.angle(58.9)
+            toggle_angle = True
         time.sleep(wobble_secs)
 
 
