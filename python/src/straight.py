@@ -46,18 +46,20 @@ def main(max_time_limit=30):
             run_robot = partial(
                 run_robot_with_theta, secs=10, threshold=6, w=640, h=480, fps=30
             )
-
+            print("DETECTING TRAFFIC LIGHTS")
             if detect_green(vid_cap, max_time_limit=10):
                 try_func(run_robot)
             else:
                 print("SORRY,  I didn't get the GREEN signal")
         ruspy.reset_mcu()
+        print("ROBOT DEAD")
     except Exception as ex:
         print("An error occurred:", ex, flush=True)
         ruspy.reset_mcu()
 
 
 if __name__ == "__main__":
+    print("ROBOT ALIVE")
     exit_flag = False
 
     # Start a separate thread to periodically check user input
@@ -67,7 +69,7 @@ if __name__ == "__main__":
     main(max_time_limit=30)
     # Wait for the input thread to finish
     input_thread.join()
-
     if exit_flag:
         ruspy.reset_mcu()
         print("USER EXIT")
+        print("ROBOT DEAD")
