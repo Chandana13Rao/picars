@@ -27,9 +27,10 @@ def run_robot_with_theta(secs=10):
     started = time.time()
     vid_cap = create_video_capture(640, 480, 30)
     motors = ruspy.motors_init(50, 100)
-    motors.speed(100, 100)
+    _, _, ms = ruspy.servos_init([-90.0, 50.0, 60.0])
+    # motors.speed(100, 100)
     # motors.forward(100)
-    time.sleep(0.5)
+    # time.sleep(0.5)
     frame_number = 0
 
     while (time.time() - started) < secs:
@@ -58,9 +59,11 @@ def run_robot_with_theta(secs=10):
             threshold = 6
             if theta > threshold:
                 print("LEFT")
+                ms.angle(45)
                 motors.turn_left(100)
             if theta < -threshold:
                 print("RIGHT")
+                ms.angle(75)
                 motors.turn_right(100)
             if abs(theta) < threshold:
                 print("STRAIGHT")
@@ -86,9 +89,10 @@ def run_robot_with_nn(secs=20, prob=0.1):
     # vid_cap = create_video_capture(1024, 512, 2)
     # ld = LaneDetector(image_width=1024, image_height=512)
     motors = ruspy.motors_init(50, 100)
+    _, _, ms = ruspy.servos_init([-90.0, 50.0, 60.0])
     # motors.speed(100, 100)
     # motors.forward(100)
-    time.sleep(0.5)
+    # time.sleep(0.5)
     frame_number = 0
 
     # create black image to add left and right lanes
@@ -127,9 +131,11 @@ def run_robot_with_nn(secs=20, prob=0.1):
             threshold = 6
             if theta > threshold:
                 print("LEFT")
+                ms.angle(45)
                 motors.turn_left(100)
             if theta < -threshold:
                 print("RIGHT")
+                ms.angle(75)
                 motors.turn_right(100)
             if abs(theta) < threshold:
                 print("STRAIGHT")
