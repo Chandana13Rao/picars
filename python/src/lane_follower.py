@@ -11,7 +11,7 @@ from algo_lane_follower import (
     process_image,
 )
 from lane_detector import LaneDetector
-from utils import create_video_capture, try_func
+from utils import create_video_capture, fill_top_img, try_func
 
 import ruspy
 
@@ -39,6 +39,7 @@ def run_robot_with_theta(
             print("FRAME NOT CAPTURED")
             continue
         print("FRAME CAPTURED")
+        frame = fill_top_img(frame, top_percent=20)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
         edged = cv2.Canny(blurred, 85, 85)

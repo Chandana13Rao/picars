@@ -2,6 +2,7 @@ import time
 import traceback
 
 import cv2
+import numpy as np
 import rustimport.import_hook  # noqa: F401
 from traffic_light import detect_traffic_light
 
@@ -47,3 +48,18 @@ def detect_green(vid_cap, max_time_limit):
 
     print("[TRAFFIC_LIGHT]: MAX TIME LIMIT EXCEEDED")
     return False
+
+
+def fill_top_img(cv_img, top_percent=30):
+    # Get the dimensions of the image
+    height, width, _ = cv_img.shape
+    # Calculate the number of rows to cut based on the percentage
+    cut_rows = int((top_percent / 100) * height)
+    # Create a new image filled with white color for the top half
+    top_half = (
+        np.ones((cut_rows, width, 3), dtype=np.uint8) * 255
+    )  # 255 represents white color in RGB
+    # Replace the top portion of the original image with the white half
+    cv_img[:cut_rows, :] = top_half
+
+    return cv_img
