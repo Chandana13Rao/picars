@@ -50,7 +50,8 @@ def detect_green(vid_cap, max_time_limit):
         return True
 
     print("[TRAFFIC_LIGHT]: MAX TIME LIMIT EXCEEDED")
-    return False
+
+    return True
 
 
 def fill_top_img(cv_img, top_percent=30):
