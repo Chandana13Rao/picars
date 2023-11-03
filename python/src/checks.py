@@ -1,8 +1,8 @@
 import time
 import traceback
 
+import cv2
 import rustimport.import_hook  # noqa: F401
-from lane_detector import LaneDetector
 from traffic_light import detect_traffic_light
 from utils import create_video_capture
 
@@ -38,19 +38,19 @@ def motors_check():
 
 
 # Servos example check
-def servos_check():
+def servos_check(a1=10, a2=45, a3=60):
     """
     Servo Name                           : [EXTREME_LEFT, CENTER, EXTREME_RIGHT  ]
-    camera_servo_pin1 (Right-Left Servo) : [      ?     ,   80  ,        0       ]
+    camera_servo_pin1 (Right-Left Servo) : [      90    ,   10   ,        -90    ]
     camera_servo_pin2 (Up-Down Servo)    : [      0(up) ,   45  ,        90(down)]
     dir_servo_pin (Front motor Servo)    : [      30    ,   60  ,        90      ]
     """
     camera_servo_pin1, camera_servo_pin2, dir_servo_pin = ruspy.servos_init()
-    camera_servo_pin1.angle(90)
+    camera_servo_pin1.angle(a1)
     time.sleep(1)
-    camera_servo_pin2.angle(90)
+    camera_servo_pin2.angle(a2)
     time.sleep(1)
-    dir_servo_pin.angle(90)
+    dir_servo_pin.angle(a3)
     time.sleep(1)
 
 
@@ -119,11 +119,18 @@ def run_preds(vid_cap, ld):
     print(f"{left_poly = } {right_poly = }\n{left.shape = } {right.shape = }")
 
 
-def cameras_check():
-    vid_cap = create_video_capture()
-    ld = LaneDetector(image_width=224, image_height=224)
-
-    run_preds(vid_cap, ld)
+def cameras_check(fps=30):
+    vid_cap = create_video_capture(640, 480, fps)
+    # ld = LaneDetector(image_width=224, image_height=224)
+    # run_preds(vid_cap, ld)
+    for _ in range(fps):
+        _, _ = vid_cap.read()
+    ret, frame = vid_cap.read()
+    if not ret:
+        print("FRAME NOT CAPTURED")
+    cv2.imwrite("t1.jpg", frame)
+    cv2.imwrite("t2.jpg", frame)
+    cv2.imwrite("t3.jpg", frame)
 
 
 def try_func(func):
