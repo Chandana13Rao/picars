@@ -52,6 +52,9 @@ def main(max_time_limit=30):
         if detect_green(vid_cap, max_time_limit=10):
             try:
                 cs2.angle(75.0)
+                # Discard 1st fps
+                for _ in range(fps):
+                    _, _ = vid_cap.read()
                 run_robot_with_theta(vid_cap, motors, ms, exit_flag, max_time_limit, 6)
             except Exception as e:
                 print(f"ERROR in run_robot_with_theta: {e}")

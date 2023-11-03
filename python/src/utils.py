@@ -39,7 +39,7 @@ def detect_green(vid_cap, max_time_limit):
         if not ret:
             print("FRAME NOT CAPTURED")
             continue
-        left = fill_left_img(cv_img)
+        left = fill_left_img(cv_image)
         right = fill_right_img(left)
         bottom = fill_bottom_img(right)
         is_green, t_img = detect_traffic_light(bottom)
@@ -113,20 +113,46 @@ def fill_right_img(cv_img, right_percent=30):
     return cv_img
 
 
+def crop_image_with_percentages(
+    cv_img, left_percent=30, right_percent=30, bottom_percent=70, top_percent=0
+):
+    # Get the dimensions of the original image
+    height, width, _ = cv_img.shape
+
+    # Calculate the number of rows and columns to cut based on the percentages
+    cut_left_cols = int((left_percent / 100) * width)
+    cut_right_cols = int((right_percent / 100) * width)
+    cut_top_rows = int((top_percent / 100) * height)
+    cut_bottom_rows = int((bottom_percent / 100) * height)
+
+    # Calculate the coordinates for cropping
+    top_left_x = cut_left_cols
+    top_left_y = cut_top_rows
+    bottom_right_x = width - cut_right_cols
+    bottom_right_y = height - cut_bottom_rows
+
+    # Crop the image based on the calculated coordinates
+    cropped_img = cv_img[top_left_y:bottom_right_y, top_left_x:bottom_right_x]
+
+    return cropped_img
+
+
 if __name__ == "__main__":
     filenames = [
-        "../assests/traffic_light_red",
-        "../assests/traffic_light_green",
-        "../assests/traffic_light_yellow",
-        "../assests/red",
+        "t_img",
     ]
 
     for filename in filenames:
         print(filename)
         # read image
         cv_img = cv2.imread(filename + ".jpg")
-        top = fill_top_img(cv_img)
-        left = fill_left_img(top)
-        right = fill_right_img(left)
-        bottom = fill_bottom_img(right)
-        cv2.imwrite(filename + "full.jpg", bottom)
+        # cv_img = fill_top_img(cv_img, 10)
+        cv_img = fill_left_img(cv_img, 30)
+        cv_img = fill_right_img(cv_img, 30)
+        cv_img = fill_bottom_img(cv_img, 70)
+        crop = crop_image_with_percentages(cv_img)
+        cv2.imwrite(filename + "white.jpg", cv_img)
+        cv2.imwrite(filename + "crop.jpg", crop)
+        is_green, t_img = detect_traffic_light(crop)
+        print(is_green)
+        cv2.imwrite("t_img.jpg", t_img)
