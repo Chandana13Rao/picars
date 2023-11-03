@@ -39,7 +39,10 @@ def detect_green(vid_cap, max_time_limit):
         if not ret:
             print("FRAME NOT CAPTURED")
             continue
-        is_green, t_img = detect_traffic_light(cv_image)
+        left = fill_left_img(cv_img)
+        right = fill_right_img(left)
+        bottom = fill_bottom_img(right)
+        is_green, t_img = detect_traffic_light(bottom)
         cv2.imwrite("t_img.jpg", t_img)
         if not is_green:
             continue
@@ -63,3 +66,67 @@ def fill_top_img(cv_img, top_percent=30):
     cv_img[:cut_rows, :] = top_half
 
     return cv_img
+
+
+def fill_bottom_img(cv_img, top_percent=30):
+    # Get the dimensions of the image
+    height, width, _ = cv_img.shape
+    # Calculate the number of rows to cut based on the percentage
+    cut_rows = int((top_percent / 100) * height)
+    # Create a new image filled with white color for the top half
+    top_half = (
+        np.ones((cut_rows, width, 3), dtype=np.uint8) * 255
+    )  # 255 represents white color in RGB
+    # Replace the top portion of the original image with the white half
+    cv_img[-cut_rows:, :] = top_half
+
+    return cv_img
+
+
+def fill_left_img(cv_img, left_percent=30):
+    # Get the dimensions of the image
+    height, width, _ = cv_img.shape
+    # Calculate the number of columns to cut based on the percentage
+    cut_cols = int((left_percent / 100) * width)
+    # Create a new image filled with white color for the left half
+    left_half = (
+        np.ones((height, cut_cols, 3), dtype=np.uint8) * 255
+    )  # 255 represents white color in RGB
+    # Replace the left portion of the original image with the white half
+    cv_img[:, :cut_cols] = left_half
+
+    return cv_img
+
+
+def fill_right_img(cv_img, right_percent=30):
+    # Get the dimensions of the image
+    height, width, _ = cv_img.shape
+    # Calculate the number of columns to cut based on the percentage
+    cut_cols = int((right_percent / 100) * width)
+    # Create a new image filled with white color for the right half
+    right_half = (
+        np.ones((height, cut_cols, 3), dtype=np.uint8) * 255
+    )  # 255 represents white color in RGB
+    # Replace the right portion of the original image with the white half
+    cv_img[:, -cut_cols:] = right_half
+
+    return cv_img
+
+
+if __name__ == "__main__":
+    filenames = [
+        "../assests/traffic_light_red",
+        "../assests/traffic_light_green",
+        "../assests/traffic_light_yellow",
+        "../assests/red",
+    ]
+
+    for filename in filenames:
+        print(filename)
+        # read image
+        cv_img = cv2.imread(filename + ".jpg")
+        top = fill_top_img(cv_img)
+        left = fill_left_img(top)
+        right = fill_right_img(left)
+        bottom = fill_bottom_img(right)
+        cv2.imwrite(filename + "full.jpg", bottom)
