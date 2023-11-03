@@ -34,7 +34,7 @@ def run_forward(secs, speed, wobble_secs=0.1):
         time.sleep(wobble_secs)
 
 
-def main(max_time_limit=30):
+def main(max_time_limit=0):
     fps = 30
     ruspy.main_init()
     motors = ruspy.motors_init(50, 100)
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     input_thread = threading.Thread(target=check_user_input)
     input_thread.start()
     # Run the main code in the main thread
-    main(10)
+    main(0)
     # Wait for the input thread to finish
     input_thread.join()
     if exit_flag:
