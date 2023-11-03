@@ -50,12 +50,16 @@ def run_robot_with_theta(
         else:
             print("CALCULATE THETA")
             theta = 0
-            lines = lines.squeeze()  # Remove unnecessary dimensions
-            x1, y1, x2, y2 = lines[:, 0], lines[:, 1], lines[:, 2], lines[:, 3]
-            cv2.polylines(
-                frame, [lines], isClosed=False, color=(0, 255, 0), thickness=2
-            )
-            theta = np.arctan2(y2 - y1, x2 - x1).sum()
+            # lines = lines.squeeze()  # Remove unnecessary dimensions
+            # x1, y1, x2, y2 = lines[:, 0], lines[:, 1], lines[:, 2], lines[:, 3]
+            # cv2.polylines(
+            #     frame, [lines], isClosed=False, color=(0, 255, 0), thickness=2
+            # )
+            # theta = np.arctan2(y2 - y1, x2 - x1).sum()
+            for x in range(0, len(lines)):
+                for x1, y1, x2, y2 in lines[x]:
+                    cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    theta += math.atan2((y2 - y1), (x2 - x1))
 
             print(f"{theta: .3f}")
             if theta > threshold:
