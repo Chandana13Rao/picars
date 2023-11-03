@@ -1,5 +1,3 @@
-from collections import Counter
-
 import cv2
 import numpy as np
 
@@ -93,15 +91,19 @@ def detect_traffic_light(cv_img):
     #         # Print the detected color for each circle
     #         print(f"Circle at ({x}, {y}) is {color}")
     color = detect_color(cv_img)
+    print(f"{color = }")
+    is_green = False
 
-    color_counts = Counter(color)
-    red_count = color_counts["red"]
-    green_count = color_counts["green"]
-    print(f"Red count: {red_count}")
-    print(f"Green count: {green_count}")
-    is_green = red_count < green_count
-    print(f"Red count: {red_count}")
-    print(f"Green count: {green_count}")
+    # color_counts = Counter(color)
+    # red_count = color_counts["red"]
+    # green_count = color_counts["green"]
+    # print(f"Red count: {red_count}")
+    # print(f"Green count: {green_count}")
+    # is_green = red_count < green_count
+    # print(f"Red count: {red_count}")
+    # print(f"Green count: {green_count}")
+    if color == "green":
+        is_green = True
     print(f"{is_green = }")
 
     return is_green, cimg
