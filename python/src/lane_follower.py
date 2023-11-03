@@ -60,11 +60,11 @@ def run_robot_with_theta(
             print(f"{theta: .3f}")
             if theta > threshold:
                 print("LEFT")
-                ms.angle(45)
+                ms.angle(55.0)
                 motors.turn_left(100)
             if theta < -threshold:
                 print("RIGHT")
-                ms.angle(75)
+                ms.angle(65.0)
                 motors.turn_right(100)
             if abs(theta) < threshold:
                 print("STRAIGHT")
@@ -132,11 +132,11 @@ def run_robot_with_nn(secs=20, prob=0.1):
             threshold = 6
             if theta > threshold:
                 print("LEFT")
-                ms.angle(45)
+                ms.angle(55.0)
                 motors.turn_left(100)
             if theta < -threshold:
                 print("RIGHT")
-                ms.angle(75)
+                ms.angle(65.0)
                 motors.turn_right(100)
             if abs(theta) < threshold:
                 print("STRAIGHT")
@@ -192,10 +192,10 @@ def run_robot_with_nn_algo(secs=20, prob=0.1):
         )
 
         if front_servo_direction == "left":
-            dir_servo_pin.angle(45)
+            dir_servo_pin.angle(55.0)
             motors.turn_left(rear_motor_speed)
         elif front_servo_direction == "right":
-            dir_servo_pin.angle(75)
+            dir_servo_pin.angle(65.0)
             motors.turn_right(rear_motor_speed)
         else:
             motors.forward(rear_motor_speed)
@@ -236,10 +236,10 @@ def run_robot_with_algo(secs=10):
         )
 
         if front_servo_direction == "left":
-            dir_servo_pin.angle(45)
+            dir_servo_pin.angle(55.0)
             motors.turn_left(rear_motor_speed)
         elif front_servo_direction == "right":
-            dir_servo_pin.angle(75)
+            dir_servo_pin.angle(65.0)
             motors.turn_right(rear_motor_speed)
         else:
             motors.forward(rear_motor_speed)
