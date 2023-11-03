@@ -72,7 +72,7 @@ if __name__ == "__main__":
     input_thread = threading.Thread(target=check_user_input)
     input_thread.start()
     # Run the main code in the main thread
-    main(max_time_limit=30)
+    main(10)
     # Wait for the input thread to finish
     input_thread.join()
     if exit_flag:
