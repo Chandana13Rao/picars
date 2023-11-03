@@ -49,7 +49,8 @@ def detect_green(vid_cap, max_time_limit):
 
         return True
 
-    print("[TRAFFIC_LIGHT]: MAX TIME LIMIT EXCEEDED")
+    # print("[TRAFFIC_LIGHT]: MAX TIME LIMIT EXCEEDED")
+    print("TRAFFIC_LIGHT DETECTION DONE")
 
     return True
 
