@@ -50,16 +50,16 @@ def run_robot_with_theta(
         else:
             print("CALCULATE THETA")
             theta = 0
-            # lines = lines.squeeze()  # Remove unnecessary dimensions
-            # x1, y1, x2, y2 = lines[:, 0], lines[:, 1], lines[:, 2], lines[:, 3]
+            lines = lines.squeeze()  # Remove unnecessary dimensions
+            x1, y1, x2, y2 = lines[:, 0], lines[:, 1], lines[:, 2], lines[:, 3]
             # cv2.polylines(
             #     frame, [lines], isClosed=False, color=(0, 255, 0), thickness=2
             # )
-            # theta = np.arctan2(y2 - y1, x2 - x1).sum()
-            for x in range(0, len(lines)):
-                for x1, y1, x2, y2 in lines[x]:
-                    cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                    theta += math.atan2((y2 - y1), (x2 - x1))
+            theta = np.arctan2(y2 - y1, x2 - x1).sum()
+            # for x in range(0, len(lines)):
+            #     for x1, y1, x2, y2 in lines[x]:
+            #         cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            #         theta += math.atan2((y2 - y1), (x2 - x1))
 
             print(f"{theta: .3f}")
             if theta > threshold:
@@ -77,7 +77,7 @@ def run_robot_with_theta(
             theta = 0
 
         filename = f"out_{frame_number}.jpg"
-        cv2.imwrite(filename, frame)
+        # cv2.imwrite(filename, frame)
         frame_number += 1
 
     print("STOPPING MOTORS")
@@ -114,13 +114,13 @@ def run_robot_with_nn(secs=20, prob=0.1):
         lane_img[left > prob, :] = [255, 255, 255]
         lane_img[right > prob, :] = [255, 255, 255]
         filename = f"out_{frame_number}.jpg"
-        cv2.imwrite(filename, lane_img)
+        # cv2.imwrite(filename, lane_img)
         gray = cv2.cvtColor(lane_img, cv2.COLOR_BGR2GRAY)
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
         edged = cv2.Canny(blurred, 85, 85)
         lines = cv2.HoughLinesP(edged, 1, np.pi / 180, 10, minLineLength, maxLineGap)
         filename = f"lines_{frame_number}.jpg"
-        cv2.imwrite(filename, lines)
+        # cv2.imwrite(filename, lines)
 
         if lines is None:
             print("NO LINES DETECTED")
@@ -185,7 +185,7 @@ def run_robot_with_nn_algo(secs=20, prob=0.1):
         frame[left_probs > prob, :] = [0, 0, 255]  # blue
         frame[right_probs > prob, :] = [255, 0, 0]  # red
         filename = f"out_{frame_number}.jpg"
-        cv2.imwrite(filename, frame)
+        # cv2.imwrite(filename, frame)
 
         (
             front_servo_direction,
@@ -230,7 +230,7 @@ def run_robot_with_algo(secs=10):
         img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         out, left_lane, right_lane, curverad, center_diff = process_image(img)
         filename = f"out_{frame_number}.jpg"
-        cv2.imwrite(filename, out)
+        # cv2.imwrite(filename, out)
 
         front_servo_direction, rear_motor_speed = calc_servo_and_motor_controls(
             curverad, center_diff

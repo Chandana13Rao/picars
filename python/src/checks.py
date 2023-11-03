@@ -1,7 +1,6 @@
 import time
 import traceback
 
-import cv2
 import rustimport.import_hook  # noqa: F401
 from traffic_light import detect_traffic_light
 from utils import create_video_capture
@@ -128,9 +127,9 @@ def cameras_check(fps=30):
     ret, frame = vid_cap.read()
     if not ret:
         print("FRAME NOT CAPTURED")
-    cv2.imwrite("t1.jpg", frame)
-    cv2.imwrite("t2.jpg", frame)
-    cv2.imwrite("t3.jpg", frame)
+    # cv2.imwrite("t1.jpg", frame)
+    # cv2.imwrite("t2.jpg", frame)
+    # cv2.imwrite("t3.jpg", frame)
 
 
 def try_func(func):

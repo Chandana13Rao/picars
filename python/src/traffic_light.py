@@ -123,5 +123,5 @@ if __name__ == "__main__":
         cv_img = cv2.imread(filename + ".jpg")
         print("*****************************************")
         _, cimg = detect_traffic_light(cv_img)
-        cv2.imwrite(filename + "_circles.jpg", cimg)
+        # cv2.imwrite(filename + "_circles.jpg", cimg)
         print("*****************************************")

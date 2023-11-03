@@ -43,7 +43,7 @@ def detect_green(vid_cap, max_time_limit):
         right = fill_right_img(left)
         bottom = fill_bottom_img(right)
         is_green, t_img = detect_traffic_light(bottom)
-        cv2.imwrite("t_img.jpg", t_img)
+        # cv2.imwrite("t_img.jpg", t_img)
         if not is_green:
             continue
 
@@ -153,8 +153,8 @@ if __name__ == "__main__":
         cv_img = fill_right_img(cv_img, 30)
         cv_img = fill_bottom_img(cv_img, 70)
         crop = crop_image_with_percentages(cv_img)
-        cv2.imwrite(filename + "white.jpg", cv_img)
-        cv2.imwrite(filename + "crop.jpg", crop)
+        # cv2.imwrite(filename + "white.jpg", cv_img)
+        # cv2.imwrite(filename + "crop.jpg", crop)
         is_green, t_img = detect_traffic_light(crop)
         print(is_green)
-        cv2.imwrite("t_img.jpg", t_img)
+        # cv2.imwrite("t_img.jpg", t_img)
