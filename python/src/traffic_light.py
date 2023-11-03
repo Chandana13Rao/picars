@@ -63,40 +63,38 @@ def detect_color(cv_img):
 
 def detect_traffic_light(cv_img):
     cimg = cv_img
-    gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
-    gray = cv2.medianBlur(gray, 5)
-    colors = []
+    # gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+    # gray = cv2.medianBlur(gray, 5)
+    # colors = []
 
-    # hough circle detect
-    circles = cv2.HoughCircles(
-        gray,
-        cv2.HOUGH_GRADIENT,
-        1,
-        100,
-        param1=100,
-        param2=40,
-        minRadius=0,
-        maxRadius=30,
-    )
+    # # hough circle detect
+    # circles = cv2.HoughCircles(
+    #     gray,
+    #     cv2.HOUGH_GRADIENT,
+    #     1,
+    #     100,
+    #     param1=100,
+    #     param2=40,
+    #     minRadius=0,
+    #     maxRadius=30,
+    # )
 
     # If circles were detected, proceed with color detection
-    if circles is not None:
-        print(f"{len(circles[0]) = }")
-        for circle in circles[0]:
-            x, y, r = map(round, circle)
-            cv2.circle(cimg, (x, y), r, (0, 255, 0), 2)
-            # Extract the region around the circle
-            region_around_circle = cv_img[y - r : y + r, x - r : x + r]
-            color = detect_color(region_around_circle)
-            colors.append(color)
+    # if circles is not None:
+    #     print(f"{len(circles[0]) = }")
+    #     for circle in circles[0]:
+    #         x, y, r = map(round, circle)
+    #         cv2.circle(cimg, (x, y), r, (0, 255, 0), 2)
+    #         # Extract the region around the circle
+    #         region_around_circle = cv_img[y - r : y + r, x - r : x + r]
+    #         color = detect_color(region_around_circle)
+    #         colors.append(color)
 
-            # Print the detected color for each circle
-            print(f"Circle at ({x}, {y}) is {color}")
-    else:
-        print("No circles detected")
-        color = "other"
+    #         # Print the detected color for each circle
+    #         print(f"Circle at ({x}, {y}) is {color}")
+    color = detect_color(cv_img)
 
-    color_counts = Counter(colors)
+    color_counts = Counter(color)
     red_count = color_counts["red"]
     green_count = color_counts["green"]
     print(f"Red count: {red_count}")
