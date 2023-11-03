@@ -40,7 +40,6 @@ def main(max_time_limit=0):
     motors = ruspy.motors_init(50, 100)
     cs1, cs2, ms = ruspy.servos_init()
     cs1.angle(-5.0)
-    cs2.angle(45.0)
     ms.angle(60.0)
     print("MAIN INIT SUCCESSFULL")
     try:
@@ -49,6 +48,8 @@ def main(max_time_limit=0):
         for _ in range(fps):
             _, _ = vid_cap.read()
         # run_forward = partial(run_forward, secs=60, speed=100)
+        print("TRAFFIC LIGHT DETECTION STARTED")
+        cs2.angle(37.0)
         if detect_green(vid_cap, max_time_limit=10):
             try:
                 cs2.angle(75.0)
