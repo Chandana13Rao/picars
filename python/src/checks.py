@@ -38,10 +38,10 @@ def motors_check():
 
 
 # Servos example check
-def servos_check(a1=10, a2=45, a3=60):
+def servos_check(a1=-10, a2=45, a3=60):
     """
     Servo Name                           : [EXTREME_LEFT, CENTER, EXTREME_RIGHT  ]
-    camera_servo_pin1 (Right-Left Servo) : [      90    ,   10   ,        -90    ]
+    camera_servo_pin1 (Right-Left Servo) : [      90    ,   -10   ,        -90   ]
     camera_servo_pin2 (Up-Down Servo)    : [      0(up) ,   45  ,        90(down)]
     dir_servo_pin (Front motor Servo)    : [      30    ,   60  ,        90      ]
     """

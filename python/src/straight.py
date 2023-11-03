@@ -38,7 +38,8 @@ def main(max_time_limit=30):
     fps = 30
     ruspy.main_init()
     motors = ruspy.motors_init(50, 100)
-    _, _, ms = ruspy.servos_init()
+    cs1, cs2, ms = ruspy.servos_init()
+    cs2.angle(45)
     print("MAIN INIT SUCCESSFULL")
     try:
         vid_cap = create_video_capture(640, 480, fps=fps)
@@ -48,6 +49,7 @@ def main(max_time_limit=30):
         # run_forward = partial(run_forward, secs=60, speed=100)
         if detect_green(vid_cap, max_time_limit=10):
             try:
+                cs2.angle(65)
                 run_robot_with_theta(vid_cap, motors, ms, exit_flag, max_time_limit, 6)
             except Exception as e:
                 print(f"ERROR in run_robot_with_theta: {e}")
