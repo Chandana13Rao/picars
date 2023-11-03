@@ -35,12 +35,16 @@ def run_forward(secs, speed, wobble_secs=0.1):
 
 
 def main(max_time_limit=30):
+    fps = 30
     ruspy.main_init()
     motors = ruspy.motors_init(50, 100)
     _, _, ms = ruspy.servos_init()
     print("MAIN INIT SUCCESSFULL")
     try:
-        vid_cap = create_video_capture(640, 480, fps=30)
+        vid_cap = create_video_capture(640, 480, fps=fps)
+        # Discard 1st fps
+        for _ in range(fps):
+            _, _ = vid_cap.read()
         # run_forward = partial(run_forward, secs=60, speed=100)
         if detect_green(vid_cap, max_time_limit=10):
             try:

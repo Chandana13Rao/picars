@@ -38,7 +38,9 @@ def detect_green(vid_cap, max_time_limit):
         if not ret:
             print("FRAME NOT CAPTURED")
             continue
-        if not detect_traffic_light(cv_image):
+        is_green, t_img = detect_traffic_light(cv_image)
+        cv2.imwrite(t_img, "t_img.jpg")
+        if not is_green:
             continue
 
         return True
