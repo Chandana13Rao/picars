@@ -1,5 +1,5 @@
 # picars
-Autonomous Vehicle using Raspberry Pi and PiCar-X kit created using Rust
+Autonomous Vehicle using Raspberry Pi and PiCar-X kit created using Rust and Python
 
 # Folder Structure
 ```mermaid
