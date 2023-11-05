@@ -5,9 +5,16 @@ Autonomous Vehicle using Raspberry Pi and PiCar-X kit created using Rust
 ```mermaid
 graph TD;
 
-  1[dust<br> Rust Picar-X binary]
+  1[dust<br> Picar-X binary]
   1 --> 1_1
   1 --> 1_2
+
+  2[ruspy<br> Rust Base Software]
+  2 --> 1_1
+  2 --> 1_2
+  2 --> 3
+
+  3[Python<br> Python frontend -> ASW with Rust Backend -> BSW]
 
   1_1[drishti<br> Image processing library]
   1_1 --> 1_1_1[depth<br> Ultrasonic sensor module]
@@ -15,14 +22,7 @@ graph TD;
   1_1 --> 1_1_3[lane<br> Lane module]
 
   1_2[vahana<br> Driving library]
-  1_2 --> 1_2_2[drive<br> Motors and Servo module]
-
-  2[ruspy<br> Rust Base Software]
-  2 --> 1_1
-  2 --> 1_2
-  2 --> 3
-
-  3[Python<br> Python frontend (ASW) with Rust Backend (BSW)]
+  1_2 --> 1_2_1[drive<br> Motors and Servo module]
 ```
 
 # Pin Configuration
