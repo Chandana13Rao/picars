@@ -22,7 +22,7 @@ graph TD;
   2 --> 1_2
   2 --> 3
 
- 3[Python<br> Python frontend (ASW) with Rust Backend (BSW)]
+  3[Python<br> Python frontend (ASW) with Rust Backend (BSW)]
 ```
 
 # Pin Configuration
