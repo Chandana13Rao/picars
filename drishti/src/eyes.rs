@@ -122,11 +122,7 @@ pub fn probabilistic_hough(canny_img: &Mat) -> Result<Vector<VecN<i32, 4>>> {
     Ok(p_lines)
 }
 
-fn calculate_lane_center(
-    v_lines: &VectorOfVec4i,
-    h_lines: &VectorOfVec4i,
-    image_width: f32,
-) -> opencv::Result<(f32, Vec4i, Vec4i)> {
+fn calculate_lane_center(v_lines: &VectorOfVec4i) -> opencv::Result<(f32, Vec4i, Vec4i)> {
     // Calculate the lane center as the average of x-coordinates of the detected lines
     // TODO: Line count should be 2 (maybe nearest two ?), bcz we need to detect only one lane
     let mut nearest_left = VecN([0, 0, 0, 0]);
@@ -202,15 +198,9 @@ fn line_categorization(
 }
 
 #[cfg(feature = "gui")]
-fn lane_detector(
-    v_lines: &VectorOfVec4i,
-    h_lines: &VectorOfVec4i,
-    image_width: f32,
-    image: &Mat,
-) -> Result<()> {
+fn lane_detector(v_lines: &VectorOfVec4i, image: &Mat) -> Result<()> {
     // Calculate the lane center
-    let (lane_center_x, nearest_left, nearest_right) =
-        calculate_lane_center(v_lines, h_lines, image_width)?;
+    let (lane_center_x, nearest_left, nearest_right) = calculate_lane_center(v_lines)?;
     // image centre is always 0.5 ?
     let image_center_x = 320.0;
     // Calculate the deviation from the lane center
@@ -276,7 +266,7 @@ fn lane_detector(
 #[cfg(not(feature = "gui"))]
 fn lane_detector(lines: &VectorOfVec4i, image_width: f32) -> Result<()> {
     // Calculate the lane center
-    let (lane_center_x, line_count) = calculate_lane_center(lines, image_width)?;
+    let (lane_center_x, line_count) = calculate_lane_center(lines)?;
     // image centre is always 0.5 ?
     let image_center_x = 0.5;
     // Calculate the deviation from the lane center
@@ -476,7 +466,7 @@ pub fn cv_example_vid() -> Result<()> {
         } else {
             println!("🔴 🟥 😡 [RED]");
         }
-        let (horizontal, vertical, others) = line_categorization(
+        let (_, vertical, _) = line_categorization(
             &hough_lines,
             0.01,
             1000.,
@@ -484,8 +474,7 @@ pub fn cv_example_vid() -> Result<()> {
         );
         #[cfg(feature = "gui")]
         {
-            lane_detector(&vertical, &horizontal, frame_img.cols() as f32, &frame_img)
-                .context("Lane detection failed")?;
+            lane_detector(&vertical, &frame_img).context("Lane detection failed")?;
         }
         #[cfg(not(feature = "gui"))]
         {

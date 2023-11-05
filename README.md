@@ -5,18 +5,24 @@ Autonomous Vehicle using Raspberry Pi and PiCar-X kit created using Rust
 ```mermaid
 graph TD;
 
-  1[dust<br> Picar-X binary]
+  1[dust<br> Rust Picar-X binary]
   1 --> 1_1
   1 --> 1_2
 
   1_1[drishti<br> Image processing library]
   1_1 --> 1_1_1[depth<br> Ultrasonic sensor module]
   1_1 --> 1_1_2[eyes<br> Camera module]
+  1_1 --> 1_1_3[lane<br> Lane module]
 
   1_2[vahana<br> Driving library]
-  1_2 --> 1_2_1[axel<br> Front wheel servo module]
-  1_2 --> 1_2_2[drive<br> Rear wheel drive module]
-  1_2 --> 1_2_3[neck<br> Camera servo module]
+  1_2 --> 1_2_2[drive<br> Motors and Servo module]
+
+  2[ruspy<br> Rust Base Software]
+  2 --> 1_1
+  2 --> 1_2
+  2 --> 3
+
+ 3[Python<br> Python frontend (ASW) with Rust Backend (BSW)]
 ```
 
 # Pin Configuration
@@ -41,15 +47,18 @@ graph TD;
 ===============================================================================
  Language            Files        Lines         Code     Comments       Blanks
 ===============================================================================
- Python                 10         1376         1043          109          224
+ Python                 10         1709         1230          214          265
  TOML                    7           83           59            8           16
  Prolog                  1            8            8            0            0
- Markdown                1           35            0           29            6
 -------------------------------------------------------------------------------
- Rust                   14         1774         1276          207          291
+ Rust                   12         1795         1288          211          296
  |- Markdown             1            3            0            3            0
- (Total)                           1777         1276          210          291
+ (Total)                           1798         1288          214          296
+-------------------------------------------------------------------------------
+ Markdown                1           47            0           36           11
+ |- Python               1           17           17            0            0
+ (Total)                             64           17           36           11
 ===============================================================================
- Total                  33         3276         2386          353          537
+ Total                  31         3642         2585          469          588
 ===============================================================================
 ```

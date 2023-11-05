@@ -1,5 +1,3 @@
-use std::ops::Add;
-
 use anyhow::{Context, Result};
 
 use opencv::{
@@ -239,7 +237,7 @@ pub fn warp_example() -> Result<()> {
 
     if frame_img.size()?.width > 0 {
         let masked_white = white_thresholding(&frame_img)?;
-        let canny_img = canny_edge_transform(&frame_img)?;
+        let canny_img = canny_edge_transform(&masked_white)?;
         let _warped_img = warp_perspective_transform(&canny_img)?;
     }
 
