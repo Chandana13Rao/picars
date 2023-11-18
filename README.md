@@ -62,3 +62,6 @@ graph TD;
  Total                  31         3642         2585          469          588
 ===============================================================================
 ```
+
+# Note
+> With the experimentation and experience gained from this repo, i have started porting Python **[robot-hat](https://github.com/sunfounder/robot-hat)** library to Rust **[robot-hat-rs](https://github.com/Karthik-d-k/robot-hat-rs)**
